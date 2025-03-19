@@ -1,0 +1,84 @@
+{
+  "intersection": {
+    "latitude": 33.960192828395996,
+    "longitude": -84.52790520126695,
+    "timestamp": "2025-03-19 13:21:07"
+  },
+  "approaches": {
+    "North": {
+      "current_speed": 61,
+      "free_flow_speed": 61,
+      "current_travel_time": 69,
+      "free_flow_travel_time": 69,
+      "confidence": 1,
+      "road_closure": false,
+      "delay": 0
+    },
+    "South": {
+      "current_speed": 49,
+      "free_flow_speed": 60,
+      "current_travel_time": 92,
+      "free_flow_travel_time": 75,
+      "confidence": 1,
+      "road_closure": false,
+      "delay": 17
+    },
+    "East": {
+      "current_speed": 26,
+      "free_flow_speed": 43,
+      "current_travel_time": 123,
+      "free_flow_travel_time": 74,
+      "confidence": 1,
+      "road_closure": false,
+      "delay": 49
+    },
+    "West": {
+      "current_speed": 23,
+      "free_flow_speed": 41,
+      "current_travel_time": 111,
+      "free_flow_travel_time": 62,
+      "confidence": 1,
+      "road_closure": false,
+      "delay": 49
+    },
+    "Northeast": {
+      "current_speed": 16,
+      "free_flow_speed": 27,
+      "current_travel_time": 13,
+      "free_flow_travel_time": 7,
+      "confidence": 1,
+      "road_closure": false,
+      "delay": 6
+    },
+    "Northwest": {
+      "current_speed": 61,
+      "free_flow_speed": 61,
+      "current_travel_time": 69,
+      "free_flow_travel_time": 69,
+      "confidence": 1,
+      "road_closure": false,
+      "delay": 0
+    },
+    "Southeast": {
+      "current_speed": 7,
+      "free_flow_speed": 7,
+      "current_travel_time": 77,
+      "free_flow_travel_time": 77,
+      "confidence": 1,
+      "road_closure": false,
+      "delay": 0
+    },
+    "Southwest": {
+      "current_speed": 26,
+      "free_flow_speed": 43,
+      "current_travel_time": 123,
+      "free_flow_travel_time": 74,
+      "confidence": 1,
+      "road_closure": false,
+      "delay": 49
+    }
+  },
+  "incidents": {
+    "error": "Failed after 3 retries: 400 Client Error: Bad Request for url: https://api.tomtom.com/traffic/services/5/incidentDetails?bbox=-84.53290520126694%2C33.955192828395994%2C-84.52290520126695%2C33.965192828396&fields=%7Bincidents%7Btype%2Cgeometry%2Cproperties%7BiconCategory%2CmagnitudeOfDelay%2Cevents%7Bdescription%2Ccode%7D%2CstartTime%2CendTime%2Cfrom%2Cto%2Cdelay%2CroadNumbers%2CtimeValidity%7D%7D%7D&language=en-US&categoryFilter=0%2C1%2C2%2C3%2C4%2C5%2C6%2C7%2C8%2C9%2C10%2C11&timeValidityFilter=present&key=xZtdOgISw8ASZ6DKOzHGT2xCvQ9xPKKc"
+  }
+}
