@@ -9,6 +9,7 @@ Usage:
     client = TomTomClient(api_key='your_api_key')
     traffic_data = client.get_traffic_flow(latitude, longitude)
 """
+#this is an example commit message for tutorial purposes
 
 import requests
 import json
