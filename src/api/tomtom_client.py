@@ -11,13 +11,13 @@ Usage:
 """
 #this is an example commit message for tutorial purposes
 
-import requests
+import requests # type: ignore
 import json
 import time
 import logging
 import os
 from typing import Dict, List, Any, Optional, Tuple, Union
-from dotenv import load_dotenv
+from dotenv import load_dotenv # type: ignore
 
 # Configure logging
 logging.basicConfig(
