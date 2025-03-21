@@ -1,0 +1,90 @@
+{
+  "intersection": {
+    "latitude": 33.960192828395996,
+    "longitude": -84.52790520126695,
+    "timestamp": "2025-03-21 03:24:33"
+  },
+  "approaches": {
+    "North": {
+      "current_speed": 61,
+      "free_flow_speed": 61,
+      "current_travel_time": 69,
+      "free_flow_travel_time": 69,
+      "confidence": 1,
+      "road_closure": false,
+      "delay": 0
+    },
+    "South": {
+      "current_speed": 61,
+      "free_flow_speed": 61,
+      "current_travel_time": 73,
+      "free_flow_travel_time": 73,
+      "confidence": 1,
+      "road_closure": false,
+      "delay": 0
+    },
+    "East": {
+      "current_speed": 43,
+      "free_flow_speed": 43,
+      "current_travel_time": 74,
+      "free_flow_travel_time": 74,
+      "confidence": 1,
+      "road_closure": false,
+      "delay": 0
+    },
+    "West": {
+      "current_speed": 41,
+      "free_flow_speed": 41,
+      "current_travel_time": 62,
+      "free_flow_travel_time": 62,
+      "confidence": 1,
+      "road_closure": false,
+      "delay": 0
+    },
+    "Northeast": {
+      "current_speed": 27,
+      "free_flow_speed": 27,
+      "current_travel_time": 7,
+      "free_flow_travel_time": 7,
+      "confidence": 1,
+      "road_closure": false,
+      "delay": 0
+    },
+    "Northwest": {
+      "current_speed": 61,
+      "free_flow_speed": 61,
+      "current_travel_time": 69,
+      "free_flow_travel_time": 69,
+      "confidence": 1,
+      "road_closure": false,
+      "delay": 0
+    },
+    "Southeast": {
+      "current_speed": 7,
+      "free_flow_speed": 7,
+      "current_travel_time": 77,
+      "free_flow_travel_time": 77,
+      "confidence": 1,
+      "road_closure": false,
+      "delay": 0
+    },
+    "Southwest": {
+      "current_speed": 43,
+      "free_flow_speed": 43,
+      "current_travel_time": 74,
+      "free_flow_travel_time": 74,
+      "confidence": 1,
+      "road_closure": false,
+      "delay": 0
+    }
+  },
+  "incidents": {
+    "error": "400 Bad Request: {\"detailedError\":{\"code\":\"INVALID_REQUEST\",\"message\":\"Field geometry is an object.\"}}",
+    "partial_data": {
+      "detailedError": {
+        "code": "INVALID_REQUEST",
+        "message": "Field geometry is an object."
+      }
+    }
+  }
+}
