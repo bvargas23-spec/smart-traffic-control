@@ -8,7 +8,7 @@ individually and reporting which ones pass and which ones fail.
 import os
 import sys
 import traceback
-from dotenv import load_dotenv
+from dotenv import load_dotenv # type: ignore
 
 # Add the project root to the path so we can import modules correctly
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
