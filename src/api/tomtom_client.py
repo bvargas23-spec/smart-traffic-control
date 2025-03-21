@@ -152,14 +152,14 @@ class TomTomClient:
         bbox_str = ','.join(map(str, bbox))
         
         # Simplified fields parameter with proper formatting
-        fields_param = '{incidents{type,geometry,properties{iconCategory,delay,events{description,code},from,to}}}'
+        fields_param = '{incidents{type,properties{iconCategory,delay,events{description,code}}}'
         
         params = {
             'bbox': bbox_str,
             'fields': fields_param,
             'language': 'en-US',
             'categoryFilter': '0,1,2,3,4,5,6,7,8,9,10,11',  # All categories
-            'timeValidityFilter': 'present'  # Only current incidents
+            'timeValidityFilter': 'present'  
         }
         
         response = self._make_request(url, params)
