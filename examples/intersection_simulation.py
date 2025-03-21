@@ -1,1 +1,1 @@
-# This file will be where we turn our data to a csv file that could be imported into sumo simulation this means we have to come up with some code that can turn our data as some relative way to count cars, in sumo you need a variable called car_count
+
