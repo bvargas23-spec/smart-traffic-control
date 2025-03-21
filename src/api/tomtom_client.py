@@ -152,7 +152,7 @@ class TomTomClient:
         bbox_str = ','.join(map(str, bbox))
         
         # Simplified fields parameter with proper formatting
-        fields_param = '{incidents{type,properties{iconCategory,delay,events{description,code}}}'
+        fields_param = '{incidents{type,properties{iconCategory,delay,events{description,code}}}}'
         
         params = {
             'bbox': bbox_str,

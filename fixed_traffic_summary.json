@@ -2,7 +2,7 @@
   "intersection": {
     "latitude": 33.960192828395996,
     "longitude": -84.52790520126695,
-    "timestamp": "2025-03-21 03:36:37"
+    "timestamp": "2025-03-21 03:40:01"
   },
   "approaches": {
     "North": {
@@ -15,13 +15,13 @@
       "delay": 0
     },
     "South": {
-      "current_speed": 58,
+      "current_speed": 57,
       "free_flow_speed": 61,
-      "current_travel_time": 77,
+      "current_travel_time": 79,
       "free_flow_travel_time": 73,
       "confidence": 1,
       "road_closure": false,
-      "delay": 4
+      "delay": 6
     },
     "East": {
       "current_speed": 43,
@@ -79,12 +79,6 @@
     }
   },
   "incidents": {
-    "error": "400 Bad Request: {\"detailedError\":{\"code\":\"INVALID_REQUEST\",\"message\":\"Parameter 'fields' has incorrect syntax.\"}}",
-    "partial_data": {
-      "detailedError": {
-        "code": "INVALID_REQUEST",
-        "message": "Parameter 'fields' has incorrect syntax."
-      }
-    }
+    "incidents": []
   }
 }
