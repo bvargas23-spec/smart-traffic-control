@@ -1,40 +1,92 @@
-# traffic_visualization.py
+# traffic_visualization.py - Debug Version
 import os
 import sys
+import json
+import traceback
+from datetime import datetime
 
 # Ensure the project root is in the Python path
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
+print(f"Script starting at: {datetime.now()}")
+print(f"Current working directory: {os.getcwd()}")
+print(f"Project root directory: {project_root}")
+print(f"Python path: {sys.path}")
+
+# Check for write permissions in the current directory
+try:
+    test_file = "write_test.txt"
+    with open(test_file, 'w') as f:
+        f.write("Test write permissions")
+    os.remove(test_file)
+    print("Successfully verified write permissions in current directory")
+except Exception as e:
+    print(f"Warning: Cannot write to current directory: {e}")
+
 # Now verify that src can be found
 src_dir = os.path.join(project_root, 'src')
 if not os.path.exists(src_dir):
     print(f"Error: The 'src' directory does not exist at {src_dir}")
-    print(f"Current directory: {os.getcwd()}")
-    print(f"Project root: {project_root}")
+    # List directories in project root to help diagnose
+    print("Contents of project root:")
+    for item in os.listdir(project_root):
+        print(f"  {item}")
     sys.exit(1)
 
+# Try to import required packages
+required_packages = ['folium', 'pandas', 'python-dotenv']
+missing_packages = []
+
 try:
     import folium
-except ModuleNotFoundError:
-    print("Error: folium module not found. Installing folium...")
-    os.system("pip install folium")
-    import folium
+    print("Successfully imported folium")
+except ImportError:
+    missing_packages.append('folium')
 
 try:
     import pandas as pd
-except ModuleNotFoundError:
-    print("Error: pandas module not found. Installing pandas...")
-    os.system("pip install pandas")
-    import pandas as pd
+    print("Successfully imported pandas")
+except ImportError:
+    missing_packages.append('pandas')
 
 try:
     from dotenv import load_dotenv
-except ModuleNotFoundError:
-    print("Error: python-dotenv module not found. Installing python-dotenv...")
-    os.system("pip install python-dotenv")
-    from dotenv import load_dotenv
+    print("Successfully imported python-dotenv")
+except ImportError:
+    missing_packages.append('python-dotenv')
+
+# Install missing packages if any
+if missing_packages:
+    print(f"Need to install the following packages: {', '.join(missing_packages)}")
+    for package in missing_packages:
+        print(f"Installing {package}...")
+        os.system(f"pip install {package}")
+    
+    # Try imports again
+    try:
+        import folium
+        import pandas as pd
+        from dotenv import load_dotenv
+        print("Successfully imported all packages after installation")
+    except ImportError as e:
+        print(f"Error importing packages even after installation: {e}")
+        sys.exit(1)
+
+# Check for json file
+json_file_path = os.path.join(project_root, "fixed_traffic_summary.json")
+print(f"Checking for JSON file at: {json_file_path}")
+if os.path.exists(json_file_path):
+    print(f"Found JSON file: {json_file_path}")
+else:
+    print(f"Warning: JSON file not found at {json_file_path}")
+    # Try to find it elsewhere
+    for root, dirs, files in os.walk(project_root):
+        if "fixed_traffic_summary.json" in files:
+            json_file_path = os.path.join(root, "fixed_traffic_summary.json")
+            print(f"Found JSON file at: {json_file_path}")
+            break
 
 # Now try to import the project modules
 try:
@@ -44,28 +96,23 @@ try:
 except ImportError as e:
     print(f"Error importing project modules: {e}")
     print("\nDebugging information:")
-    print(f"Python path: {sys.path}")
     print("\nContents of src directory:")
     if os.path.exists(src_dir):
         for root, dirs, files in os.walk(src_dir):
-            print(f"Directory: {root}")
-            for dir in dirs:
-                print(f"  Subdirectory: {dir}")
-            for file in files:
-                print(f"  File: {file}")
+            if os.path.basename(root) == 'api':
+                print(f"  API directory contents: {root}")
+                for file in files:
+                    print(f"    File: {file}")
     sys.exit(1)
 
 def create_intersection_visualization(intersection_lat, intersection_lon, 
                                     approach_data, output_file="intersection_visualization.html"):
     """
     Create an interactive visualization of an intersection with traffic data.
-    
-    Args:
-        intersection_lat (float): Latitude of the intersection center
-        intersection_lon (float): Longitude of the intersection center
-        approach_data (dict): Traffic data for each approach
-        output_file (str): Output HTML file name
     """
+    print(f"Creating visualization for intersection at ({intersection_lat}, {intersection_lon})")
+    print(f"Output file will be: {os.path.abspath(output_file)}")
+    
     # Create a map centered on the intersection
     m = folium.Map(location=[intersection_lat, intersection_lon], zoom_start=17)
     
@@ -89,15 +136,19 @@ def create_intersection_visualization(intersection_lat, intersection_lon,
     }
     
     # Add markers for each approach with traffic data popups
+    print(f"Adding markers for {len(approach_data)} approaches")
     for direction, data in approach_data.items():
         if "error" in data:
+            print(f"Skipping {direction} approach due to error: {data.get('error')}")
             continue
             
         # Get position for this approach
         pos = approach_positions.get(direction)
         if not pos:
+            print(f"No position defined for {direction} approach, skipping")
             continue
             
+        print(f"Adding marker for {direction} approach")
         # Determine color based on congestion level
         color = get_marker_color(data)
         
@@ -154,19 +205,19 @@ def create_intersection_visualization(intersection_lat, intersection_lon,
     m.get_root().html.add_child(folium.Element(legend_html))
     
     # Save the map to HTML
-    m.save(output_file)
-    print(f"Visualization saved to {output_file}")
+    try:
+        print(f"Saving visualization to {output_file}")
+        m.save(output_file)
+        print(f"Visualization saved successfully to {os.path.abspath(output_file)}")
+        return os.path.abspath(output_file)
+    except Exception as e:
+        print(f"Error saving visualization: {e}")
+        traceback.print_exc()
+        raise
 
 def get_marker_color(traffic_data):
     """
     Determine marker color based on traffic conditions.
-    Red = heavy congestion, Yellow = moderate, Green = good flow
-    
-    Args:
-        traffic_data (dict): Traffic data for an approach
-        
-    Returns:
-        str: Color name for the marker
     """
     # Get congestion level or calculate from speed ratio
     congestion_level = traffic_data.get('congestion_level')
@@ -195,95 +246,42 @@ def get_marker_color(traffic_data):
     
     return color_map.get(congestion_level, "blue")
 
-def fetch_and_visualize_intersection(intersection_lat, intersection_lon, api_key=None):
-    """
-    Fetch real traffic data for an intersection and create a visualization.
-    
-    Args:
-        intersection_lat (float): Latitude of the intersection center
-        intersection_lon (float): Longitude of the intersection center
-        api_key (str, optional): TomTom API key. If None, will look for it in environment variables.
-        
-    Returns:
-        str: Path to the generated visualization file
-    """
-    # Get API key from environment if not provided
-    if not api_key:
-        api_key = os.getenv("TOMTOM_API_KEY")
-        if not api_key:
-            raise ValueError("No API key provided. Set TOMTOM_API_KEY environment variable or pass api_key parameter.")
-    
-    # Create API client and data processor
-    client = TomTomClient(api_key=api_key)
-    processor = DataProcessor()
-    
-    print(f"Fetching traffic data for intersection at ({intersection_lat}, {intersection_lon})...")
-    
-    # Get traffic summary for the intersection
-    try:
-        traffic_summary = client.get_traffic_summary(intersection_lat, intersection_lon)
-        
-        # Process the data to add additional metrics
-        processed_data = processor.process_intersection_data(traffic_summary)
-        
-        # Save the processed data for reference
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        json_file = f"intersection_data_{timestamp}.json"
-        with open(json_file, 'w') as f:
-            json.dump(processed_data, f, indent=2)
-        print(f"Intersection data saved to {json_file}")
-        
-        # Create visualization
-        output_file = f"intersection_visualization_{timestamp}.html"
-        create_intersection_visualization(
-            intersection_lat,
-            intersection_lon,
-            processed_data["approaches"],
-            output_file
-        )
-        
-        return output_file
-        
-    except Exception as e:
-        print(f"Error fetching or processing traffic data: {str(e)}")
-        raise
-
 def visualize_from_file(json_file):
     """
     Create a visualization from a previously saved JSON file.
-    
-    Args:
-        json_file (str): Path to the JSON file with processed intersection data
-        
-    Returns:
-        str: Path to the generated visualization file
     """
+    print(f"Visualizing from file: {json_file}")
+    
     try:
         # Load the data from the file
+        print(f"Reading JSON data from {json_file}")
         with open(json_file, 'r') as f:
             data = json.load(f)
         
         if "intersection" not in data or "approaches" not in data:
+            print(f"Error: Invalid data format in JSON file. Missing 'intersection' or 'approaches' keys.")
+            print(f"Available keys: {list(data.keys())}")
             raise ValueError("Invalid data format in JSON file")
         
         # Extract intersection coordinates
         intersection_lat = data["intersection"]["latitude"]
         intersection_lon = data["intersection"]["longitude"]
+        print(f"Intersection coordinates: ({intersection_lat}, {intersection_lon})")
         
         # Create visualization
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        output_file = f"intersection_visualization_{timestamp}.html"
-        create_intersection_visualization(
+        output_file = os.path.join(os.getcwd(), f"intersection_visualization_{timestamp}.html")
+        
+        return create_intersection_visualization(
             intersection_lat,
             intersection_lon,
             data["approaches"],
             output_file
         )
         
-        return output_file
-        
     except Exception as e:
-        print(f"Error creating visualization from file: {str(e)}")
+        print(f"Error creating visualization from file: {e}")
+        traceback.print_exc()
         raise
 
 # Example usage
@@ -292,47 +290,28 @@ if __name__ == "__main__":
     load_dotenv()
     
     print("Starting traffic visualization...")
-    print(f"Python version: {sys.version}")
-    print(f"Current working directory: {os.getcwd()}")
     
-    # Option 2: Visualize from the fixed_traffic_summary.json file
-    # This is more reliable if you're having API key issues
+    # Option: Visualize from the fixed_traffic_summary.json file
     try:
-        print("Using saved traffic data from fixed_traffic_summary.json")
-        json_file_path = os.path.join(project_root, "fixed_traffic_summary.json")
+        print("\nVisualizing from fixed_traffic_summary.json file")
         if os.path.exists(json_file_path):
+            print(f"Using JSON file at: {json_file_path}")
             html_file = visualize_from_file(json_file_path)
-            print(f"Open {html_file} in your web browser to view the visualization")
+            print(f"\nVisualization complete!")
+            print(f"Open this file in your web browser to view the visualization:")
+            print(f"{html_file}")
         else:
             print(f"Error: Could not find {json_file_path}")
             # Try with a relative path instead
-            if os.path.exists("fixed_traffic_summary.json"):
-                html_file = visualize_from_file("fixed_traffic_summary.json")
-                print(f"Open {html_file} in your web browser to view the visualization")
+            alt_path = "fixed_traffic_summary.json"
+            if os.path.exists(alt_path):
+                print(f"Found JSON file at: {os.path.abspath(alt_path)}")
+                html_file = visualize_from_file(alt_path)
+                print(f"\nVisualization complete!")
+                print(f"Open this file in your web browser to view the visualization:")
+                print(f"{html_file}")
             else:
                 print("Error: Could not find fixed_traffic_summary.json in any location")
     except Exception as e:
-        print(f"Error visualizing from file: {str(e)}")
-    
-    # Choice 1: Fetch real-time data for a specific intersection
-    # Only try this if the file-based approach failed
-    if os.getenv("TOMTOM_API_KEY"):
-        try:
-            print("\nTrying to fetch live data from TomTom API...")
-            # North Marietta Pkwy Ne & Cobb Pkwy N intersection (example from your test files)
-            INTERSECTION_LAT = 33.960192828395996
-            INTERSECTION_LON = -84.52790520126695
-            
-            html_file = fetch_and_visualize_intersection(INTERSECTION_LAT, INTERSECTION_LON)
-            print(f"Open {html_file} in your web browser to view the visualization")
-            
-        except Exception as e:
-            print(f"Error fetching live data: {str(e)}")
-            print("\nIf you want to use the TomTom API:")
-            print("1. Get a free API key from https://developer.tomtom.com/")
-            print("2. Set it in your .env file as TOMTOM_API_KEY=your_key_here")
-    else:
-        print("\nNote: TOMTOM_API_KEY not found in environment variables.")
-        print("To fetch live data:")
-        print("1. Get a free API key from https://developer.tomtom.com/")
-        print("2. Set it in your .env file as TOMTOM_API_KEY=your_key_here")
+        print(f"Error in visualization process: {e}")
+        traceback.print_exc()
