@@ -9,6 +9,7 @@ import os
 import sys
 import json
 from dotenv import load_dotenv
+import traceback
 
 # Add the src directory to the Python path so we can import our modules
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -45,6 +46,7 @@ def test_traffic_flow(client):
             
     except Exception as e:
         print(f"❌ Error retrieving traffic flow data: {e}")
+        traceback.print_exc()  # Add this to show detailed error
         return False
 
 def test_traffic_incidents(client):
@@ -89,6 +91,7 @@ def test_traffic_incidents(client):
             
     except Exception as e:
         print(f"❌ Error retrieving traffic incidents data: {e}")
+        traceback.print_exc()  # Add this to show detailed error
         return False
 
 def test_intersection_approaches(client):
@@ -130,6 +133,7 @@ def test_intersection_approaches(client):
             
     except Exception as e:
         print(f"❌ Error retrieving approach data: {e}")
+        traceback.print_exc()  # Add this to show detailed error
         return False
 
 def test_traffic_summary(client):
@@ -188,6 +192,7 @@ def test_traffic_summary(client):
             
     except Exception as e:
         print(f"❌ Error retrieving traffic summary: {e}")
+        traceback.print_exc()  # Add this to show detailed error
         return False
 
 # Main test runner
@@ -217,7 +222,7 @@ if __name__ == "__main__":
     
     # Run each test
     for test in tests:
-        results.append(test())
+        results.append(test(client)) #Pass the client here
     
     # Print overall results
     print("\n=== Test Results ===")
