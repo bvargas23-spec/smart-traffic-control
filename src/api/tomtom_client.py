@@ -329,6 +329,7 @@ class TomTomClient:
         response = self._make_request(url, params)
         logger.info(f"Snapped {len(points)} points to roads")
         return response
+    
 def test_api_fixes():
     """
     Test the fixes to the TomTom API integration.
