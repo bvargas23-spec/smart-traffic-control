@@ -52,7 +52,7 @@ except ImportError:
     missing_packages.append('pandas')
 
 try:
-    from dotenv import load_dotenv
+    from dotenv import load_dotenv  # type: ignore
     print("Successfully imported python-dotenv")
 except ImportError:
     missing_packages.append('python-dotenv')
@@ -75,7 +75,7 @@ if missing_packages:
         sys.exit(1)
 
 # Check for json file
-json_file_path = os.path.join(project_root, "fixed_traffic_summary.json")
+json_file_path = os.path.join(project_root, "traffic_summary.json")
 print(f"Checking for JSON file at: {json_file_path}")
 if os.path.exists(json_file_path):
     print(f"Found JSON file: {json_file_path}")
