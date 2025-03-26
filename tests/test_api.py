@@ -8,7 +8,7 @@ fetches traffic data from TomTom APIs.
 import os
 import sys
 import json
-from dotenv import load_dotenv
+from dotenv import load_dotenv # type: ignore
 import traceback
 
 # Add the src directory to the Python path so we can import our modules

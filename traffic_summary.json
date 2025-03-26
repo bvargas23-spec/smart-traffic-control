@@ -2,44 +2,44 @@
   "intersection": {
     "latitude": 33.960192828395996,
     "longitude": -84.52790520126695,
-    "timestamp": "2025-03-26 19:17:54"
+    "timestamp": "2025-03-26 20:11:50"
   },
   "approaches": {
     "North": {
-      "current_speed": 59,
-      "free_flow_speed": 63,
-      "current_travel_time": 71,
-      "free_flow_travel_time": 67,
+      "current_speed": 49,
+      "free_flow_speed": 61,
+      "current_travel_time": 86,
+      "free_flow_travel_time": 69,
       "confidence": 1,
       "road_closure": false,
-      "delay": 4
+      "delay": 17
     },
     "South": {
-      "current_speed": 47,
+      "current_speed": 52,
       "free_flow_speed": 60,
-      "current_travel_time": 96,
+      "current_travel_time": 86,
       "free_flow_travel_time": 75,
       "confidence": 1,
       "road_closure": false,
-      "delay": 21
+      "delay": 11
     },
     "East": {
-      "current_speed": 29,
+      "current_speed": 28,
       "free_flow_speed": 43,
-      "current_travel_time": 110,
+      "current_travel_time": 114,
       "free_flow_travel_time": 74,
       "confidence": 1,
       "road_closure": false,
-      "delay": 36
+      "delay": 40
     },
     "West": {
-      "current_speed": 27,
-      "free_flow_speed": 46,
-      "current_travel_time": 94,
-      "free_flow_travel_time": 55,
+      "current_speed": 40,
+      "free_flow_speed": 52,
+      "current_travel_time": 63,
+      "free_flow_travel_time": 49,
       "confidence": 1,
       "road_closure": false,
-      "delay": 39
+      "delay": 14
     },
     "Northeast": {
       "current_speed": 27,
@@ -51,31 +51,31 @@
       "delay": 0
     },
     "Northwest": {
-      "current_speed": 59,
-      "free_flow_speed": 63,
-      "current_travel_time": 71,
-      "free_flow_travel_time": 67,
+      "current_speed": 49,
+      "free_flow_speed": 61,
+      "current_travel_time": 86,
+      "free_flow_travel_time": 69,
       "confidence": 1,
       "road_closure": false,
-      "delay": 4
+      "delay": 17
     },
     "Southeast": {
-      "current_speed": 5,
-      "free_flow_speed": 6,
-      "current_travel_time": 108,
-      "free_flow_travel_time": 90,
-      "confidence": 0.99,
+      "current_speed": 7,
+      "free_flow_speed": 7,
+      "current_travel_time": 77,
+      "free_flow_travel_time": 77,
+      "confidence": 1,
       "road_closure": false,
-      "delay": 18
+      "delay": 0
     },
     "Southwest": {
-      "current_speed": 29,
+      "current_speed": 28,
       "free_flow_speed": 43,
-      "current_travel_time": 110,
+      "current_travel_time": 114,
       "free_flow_travel_time": 74,
       "confidence": 1,
       "road_closure": false,
-      "delay": 36
+      "delay": 40
     }
   },
   "incidents": {
