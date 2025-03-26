@@ -706,17 +706,17 @@ def demo_multi_intersection():
     
     # Define multiple intersections
     intersections = {
-        "Roswell & Hwy 41": {
+        "Roswell & Hwy 41": {  # First intersection
             "North": (33.95177778, -84.52108333),
             "South": (33.95030556, -84.52027778),
             "East": (33.95091667, -84.51977778),
             "West": (33.95097222, -84.52163889)
         },
         "Cobb Pkwy & Hwy 120": {
-            "North": (33.94175, -84.51568),
-            "South": (33.93925, -84.51425),
-            "East": (33.94035, -84.51255),
-            "West": (33.94065, -84.51738)
+            "North": (33.94230, -84.51568),  # North approach on Cobb Parkway
+            "South": (33.94125, -84.51568),  # South approach on Cobb Parkway
+            "East": (33.94178, -84.51470),   # East approach on S Marietta Pkwy
+            "West": (33.94178, -84.51670)    # West approach on S Marietta Pkwy
         }
     }
     
