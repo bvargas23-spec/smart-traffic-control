@@ -141,113 +141,142 @@ def create_intersection_map(traffic_data, output_file="intersection_traffic_map.
     if not traffic_data or "intersection" not in traffic_data:
         print("Invalid traffic data provided")
         return
-    
+
     # Extract intersection coordinates
     intersection = traffic_data["intersection"]
     intersection_lat = intersection["latitude"]
     intersection_lon = intersection["longitude"]
-    
+
     # Create a map centered on the intersection
     m = folium.Map(location=[intersection_lat, intersection_lon], zoom_start=17)
-    
+
     # Add a center marker for the intersection
     folium.Marker(
         location=[intersection_lat, intersection_lon],
         popup="Intersection Center",
         icon=folium.Icon(color="blue", icon="road", prefix="fa")
     ).add_to(m)
-    
-    # Define the main approaches (adjusted to match actual road geometry)
-    # These offsets are carefully calculated to place markers on actual roads
-    approaches = {
-        "North": {
-            "lat_offset": 0.0010,
-            "lon_offset": 0.0000,
-            "angle": 0
-        },
-        "South": {
-            "lat_offset": -0.0010,
-            "lon_offset": 0.0000,
-            "angle": 180
-        },
-        "East": {
-            "lat_offset": 0.0000,
-            "lon_offset": 0.0010,
-            "angle": 90
-        },
-        "West": {
-            "lat_offset": 0.0000,
-            "lon_offset": -0.0010,
-            "angle": 270
-        }
+
+# Define the main approaches (adjusted to match actual road geometry)
+# These offsets are carefully calculated to place markers on actual roads
+# Define all eight approaches for this intersection
+approaches = {
+    "North": {  # Cobb Pkwy northbound
+        "lat_offset": 0.0010,
+        "lon_offset": -0.0003,  # Adjusted to center on northbound lanes
+        "angle": 330,  # Adjusted for true road angle
+        "icon": "car"
+    },
+    "South": {  # Cobb Pkwy southbound
+        "lat_offset": -0.0008,
+        "lon_offset": 0.0002,  # Adjusted to center on southbound lanes
+        "angle": 150,  # Adjusted for true road angle
+        "icon": "car"
+    },
+    "East": {  # N Marietta Pkwy eastbound
+        "lat_offset": 0.0001, 
+        "lon_offset": 0.0010,
+        "angle": 60,  # Adjusted for true road angle
+        "icon": "car"
+    },
+    "West": {  # N Marietta Pkwy westbound
+        "lat_offset": -0.0001,
+        "lon_offset": -0.0008,
+        "angle": 240,  # Adjusted for true road angle
+        "icon": "car"
+    },
+    "Northeast": {  # Barnes Mill Rd
+        "lat_offset": 0.0008,
+        "lon_offset": 0.0007,
+        "angle": 45,
+        "icon": "car"
+    },
+    "Northwest": {  # Upper diagonal road
+        "lat_offset": 0.0007,
+        "lon_offset": -0.0007,
+        "angle": 315,
+        "icon": "car"
+    },
+    "Southeast": {  # Lower diagonal road
+        "lat_offset": -0.0007,
+        "lon_offset": 0.0007,
+        "angle": 135,
+        "icon": "car"
+    },
+    "Southwest": {  # Lower diagonal road
+        "lat_offset": -0.0007,
+        "lon_offset": -0.0007,
+        "angle": 225,
+        "icon": "car"
     }
+}
+
+# Process and add approach markers
+for direction, offset in approaches.items():
+    # Calculate approach coordinates
+    approach_lat = intersection_lat + offset["lat_offset"]
+    approach_lon = intersection_lon + offset["lon_offset"]
     
-    # Process and add approach markers
-    for direction, offset in approaches.items():
-        # Calculate approach coordinates
-        approach_lat = intersection_lat + offset["lat_offset"]
-        approach_lon = intersection_lon + offset["lon_offset"]
-        
-        # Get traffic data for this approach
-        approach_data = traffic_data.get("approaches", {}).get(direction, {})
-        
-        # Calculate any missing metrics
-        approach_data = calculate_missing_metrics(approach_data)
-        
-        # Determine marker color based on traffic conditions
-        color = get_marker_color(approach_data)
-        
-        # Create popup content
-        popup_content = f"""
-        <b>{direction} Approach</b><br>
-        Current Speed: {approach_data.get('current_speed', 'N/A')} km/h<br>
-        Free Flow Speed: {approach_data.get('free_flow_speed', 'N/A')} km/h<br>
-        Speed Ratio: {approach_data.get('speed_ratio', 'N/A')}<br>
-        Delay: {approach_data.get('delay', 'N/A')} seconds<br>
-        Congestion Level: {approach_data.get('congestion_level', 'N/A')}<br>
-        Traffic Score: {approach_data.get('traffic_score', 'N/A')}
-        """
-        
-        # Add marker to map
-        folium.Marker(
-            location=[approach_lat, approach_lon],
-            popup=folium.Popup(popup_content, max_width=300),
-            icon=folium.Icon(color=color, icon="car", prefix="fa")
-        ).add_to(m)
+    # Get traffic data for this approach
+    approach_data = traffic_data.get("approaches", {}).get(direction, {})
     
-    # Draw lines from center to each approach
-    for direction, offset in approaches.items():
-        approach_lat = intersection_lat + offset["lat_offset"]
-        approach_lon = intersection_lon + offset["lon_offset"]
-        
-        # Draw a line from center to approach
-        folium.PolyLine(
-            locations=[[intersection_lat, intersection_lon], [approach_lat, approach_lon]],
-            color="blue",
-            weight=2,
-            opacity=0.7
-        ).add_to(m)
+    # Calculate any missing metrics
+    approach_data = calculate_missing_metrics(approach_data)
     
-    # Add a circle to represent the intersection zone
-    folium.Circle(
-        location=[intersection_lat, intersection_lon],
-        radius=100,  # meters
-        color="gray",
-        fill=True,
-        fill_opacity=0.1
+    # Determine marker color based on traffic conditions
+    color = get_marker_color(approach_data)
+    
+    # Create popup content
+    popup_content = f"""
+    <b>{direction} Approach</b><br>
+    Current Speed: {approach_data.get('current_speed', 'N/A')} km/h<br>
+    Free Flow Speed: {approach_data.get('free_flow_speed', 'N/A')} km/h<br>
+    Speed Ratio: {approach_data.get('speed_ratio', 'N/A')}<br>
+    Delay: {approach_data.get('delay', 'N/A')} seconds<br>
+    Congestion Level: {approach_data.get('congestion_level', 'N/A')}<br>
+    Traffic Score: {approach_data.get('traffic_score', 'N/A')}
+    """
+    
+    # Add marker to map
+    folium.Marker(
+        location=[approach_lat, approach_lon],
+        popup=folium.Popup(popup_content, max_width=300),
+        icon=folium.Icon(color=color, icon="car", prefix="fa")
     ).add_to(m)
+
+# Draw lines from center to each approach
+for direction, offset in approaches.items():
+    approach_lat = intersection_lat + offset["lat_offset"]
+    approach_lon = intersection_lon + offset["lon_offset"]
     
-    # Save the map
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    if "." in output_file:
-        base, ext = output_file.rsplit(".", 1)
-        output_file = f"{base}_{timestamp}.{ext}"
-    else:
-        output_file = f"{output_file}_{timestamp}.html"
+    # Draw a line from center to approach
+    folium.PolyLine(
+        locations=[[intersection_lat, intersection_lon], [approach_lat, approach_lon]],
+        color="blue",
+        weight=2,
+        opacity=0.7
+    ).add_to(m)
+
+# Add a circle to represent the intersection zone
+folium.Circle(
+    location=[intersection_lat, intersection_lon],
+    radius=100,  # meters
+    color="gray",
+    fill=True,
+    fill_opacity=0.1
+).add_to(m)
+
+# Save the map
+timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+if "." in output_file:
+    base, ext = output_file.rsplit(".", 1)
+    output_file = f"{base}_{timestamp}.{ext}"
+else:
+    output_file = f"{output_file}_{timestamp}.html"
         
-    m.save(output_file)
-    print(f"Map saved to {output_file}")
-    return output_file
+m.save(output_file)
+print(f"Map saved to {output_file}")
+return output_file
 
 def main():
     """Main entry point for the traffic visualization script."""
