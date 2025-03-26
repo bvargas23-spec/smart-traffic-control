@@ -15,7 +15,8 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from src.api.tomtom_client import TomTomClient
 
-def test_traffic_flow():
+def test_traffic_flow(client):
+    # Use the passed client parameter
     """Test getting traffic flow data for a specific point."""
     print("\n=== Testing Traffic Flow API ===")
     
@@ -46,7 +47,7 @@ def test_traffic_flow():
         print(f"❌ Error retrieving traffic flow data: {e}")
         return False
 
-def test_traffic_incidents():
+def test_traffic_incidents(client):
     """Test getting traffic incidents within a bounding box."""
     print("\n=== Testing Traffic Incidents API ===")
     
@@ -90,7 +91,7 @@ def test_traffic_incidents():
         print(f"❌ Error retrieving traffic incidents data: {e}")
         return False
 
-def test_intersection_approaches():
+def test_intersection_approaches(client):
     """Test getting traffic data for all approaches to an intersection."""
     print("\n=== Testing Intersection Approaches ===")
     
@@ -131,7 +132,7 @@ def test_intersection_approaches():
         print(f"❌ Error retrieving approach data: {e}")
         return False
 
-def test_traffic_summary():
+def test_traffic_summary(client):
     """Test getting a comprehensive traffic summary for an intersection."""
     print("\n=== Testing Traffic Summary ===")
     
