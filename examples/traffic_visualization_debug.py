@@ -40,13 +40,13 @@ required_packages = ['folium', 'pandas', 'python-dotenv']
 missing_packages = []
 
 try:
-    import folium
+    import folium # type: ignore
     print("Successfully imported folium")
 except ImportError:
     missing_packages.append('folium')
 
 try:
-    import pandas as pd
+    import pandas as pd # type: ignore
     print("Successfully imported pandas")
 except ImportError:
     missing_packages.append('pandas')
@@ -66,9 +66,9 @@ if missing_packages:
     
     # Try imports again
     try:
-        import folium
-        import pandas as pd
-        from dotenv import load_dotenv
+        import folium # type: ignore
+        import pandas as pd # type: ignore
+        from dotenv import load_dotenv # type: ignore
         print("Successfully imported all packages after installation")
     except ImportError as e:
         print(f"Error importing packages even after installation: {e}")

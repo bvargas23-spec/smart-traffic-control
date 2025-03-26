@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    
+        <script>
+            L_NO_TOUCH = false;
+            L_DISABLE_3D = false;
+        </script>
+    
+    <style>html, body {width: 100%;height: 100%;margin: 0;padding: 0;}</style>
+    <style>#map {position:absolute;top:0;bottom:0;right:0;left:0;}</style>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_5dee62c9dbf5217b1e5e5a9b4c909ebe {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+        
+</head>
+<body>
+    
+    
+            <div class="folium-map" id="map_5dee62c9dbf5217b1e5e5a9b4c909ebe" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_5dee62c9dbf5217b1e5e5a9b4c909ebe = L.map(
+                "map_5dee62c9dbf5217b1e5e5a9b4c909ebe",
+                {
+                    center: [33.960192828395996, -84.52790520126695],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 17,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_22b2669f9d22fc941f1554e73958e7a7 = L.tileLayer(
+                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 19,
+  "maxNativeZoom": 19,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_22b2669f9d22fc941f1554e73958e7a7.addTo(map_5dee62c9dbf5217b1e5e5a9b4c909ebe);
+        
+    
+            var marker_f0052cdbd7b3bc290a073c6877c4e35c = L.marker(
+                [33.960192828395996, -84.52790520126695],
+                {
+}
+            ).addTo(map_5dee62c9dbf5217b1e5e5a9b4c909ebe);
+        
+    
+            var icon_fa685b9eff5c8afc158da43d3720f536 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "blue",
+  "iconColor": "white",
+  "icon": "road",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_d275b060239edd9b2be292838fa726af = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_69b2ec4939b4c0814ac80a1612d780c3 = $(`<div id="html_69b2ec4939b4c0814ac80a1612d780c3" style="width: 100.0%; height: 100.0%;">Intersection Center</div>`)[0];
+                popup_d275b060239edd9b2be292838fa726af.setContent(html_69b2ec4939b4c0814ac80a1612d780c3);
+            
+        
+
+        marker_f0052cdbd7b3bc290a073c6877c4e35c.bindPopup(popup_d275b060239edd9b2be292838fa726af)
+        ;
+
+        
+    
+    
+                marker_f0052cdbd7b3bc290a073c6877c4e35c.setIcon(icon_fa685b9eff5c8afc158da43d3720f536);
+            
+    
+            var marker_1057aefb21e497b6157cf9368a303c89 = L.marker(
+                [33.961192828395994, -84.52790520126695],
+                {
+}
+            ).addTo(map_5dee62c9dbf5217b1e5e5a9b4c909ebe);
+        
+    
+            var icon_e9dd74bb603eea833273dbd44bbc5033 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "lightgreen",
+  "iconColor": "white",
+  "icon": "car",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_3c68f34b442b2bd47b2d814b643b9624 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_1d1db841478807b09b7688f773a3379d = $(`<div id="html_1d1db841478807b09b7688f773a3379d" style="width: 100.0%; height: 100.0%;">         <b>North Approach</b><br>         Current Speed: 47 km/h<br>         Free Flow Speed: 60 km/h<br>         Speed Ratio: 0.78<br>         Delay: 20 seconds<br>         Congestion Level: Light<br>         Traffic Score: 79         </div>`)[0];
+                popup_3c68f34b442b2bd47b2d814b643b9624.setContent(html_1d1db841478807b09b7688f773a3379d);
+            
+        
+
+        marker_1057aefb21e497b6157cf9368a303c89.bindPopup(popup_3c68f34b442b2bd47b2d814b643b9624)
+        ;
+
+        
+    
+    
+                marker_1057aefb21e497b6157cf9368a303c89.setIcon(icon_e9dd74bb603eea833273dbd44bbc5033);
+            
+    
+            var marker_85974d7e629480ed936f97b1dd1adedd = L.marker(
+                [33.959192828396, -84.52790520126695],
+                {
+}
+            ).addTo(map_5dee62c9dbf5217b1e5e5a9b4c909ebe);
+        
+    
+            var icon_66ab1eed62096a03108f8e197a78c42d = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "lightgreen",
+  "iconColor": "white",
+  "icon": "car",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_eaa68c08ef26f94101ce247303d22517 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_29cae8597f67ee0ad9cb03ca8f728669 = $(`<div id="html_29cae8597f67ee0ad9cb03ca8f728669" style="width: 100.0%; height: 100.0%;">         <b>South Approach</b><br>         Current Speed: 45 km/h<br>         Free Flow Speed: 60 km/h<br>         Speed Ratio: 0.75<br>         Delay: 25 seconds<br>         Congestion Level: Light<br>         Traffic Score: 75         </div>`)[0];
+                popup_eaa68c08ef26f94101ce247303d22517.setContent(html_29cae8597f67ee0ad9cb03ca8f728669);
+            
+        
+
+        marker_85974d7e629480ed936f97b1dd1adedd.bindPopup(popup_eaa68c08ef26f94101ce247303d22517)
+        ;
+
+        
+    
+    
+                marker_85974d7e629480ed936f97b1dd1adedd.setIcon(icon_66ab1eed62096a03108f8e197a78c42d);
+            
+    
+            var marker_7066fe9dc64e819569f0ce87f465f6d7 = L.marker(
+                [33.960192828395996, -84.52690520126694],
+                {
+}
+            ).addTo(map_5dee62c9dbf5217b1e5e5a9b4c909ebe);
+        
+    
+            var icon_075290319b782bf370da9bce5de4589b = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "green",
+  "iconColor": "white",
+  "icon": "car",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_38c479890ff8a6a32bf565b55b58d7bb = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_b5d2dc5e13d84d85f55131fbd5feaf3a = $(`<div id="html_b5d2dc5e13d84d85f55131fbd5feaf3a" style="width: 100.0%; height: 100.0%;">         <b>East Approach</b><br>         Current Speed: 43 km/h<br>         Free Flow Speed: 43 km/h<br>         Speed Ratio: 1.0<br>         Delay: 0 seconds<br>         Congestion Level: Free Flow<br>         Traffic Score: 100         </div>`)[0];
+                popup_38c479890ff8a6a32bf565b55b58d7bb.setContent(html_b5d2dc5e13d84d85f55131fbd5feaf3a);
+            
+        
+
+        marker_7066fe9dc64e819569f0ce87f465f6d7.bindPopup(popup_38c479890ff8a6a32bf565b55b58d7bb)
+        ;
+
+        
+    
+    
+                marker_7066fe9dc64e819569f0ce87f465f6d7.setIcon(icon_075290319b782bf370da9bce5de4589b);
+            
+    
+            var marker_ffada198bf0daaa59e33302dfeec4f18 = L.marker(
+                [33.960192828395996, -84.52890520126695],
+                {
+}
+            ).addTo(map_5dee62c9dbf5217b1e5e5a9b4c909ebe);
+        
+    
+            var icon_6dc8552b5bb3d7276e76da6954c88536 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "car",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_645b8f5b05f92f7c85ccf8e0e22d0704 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_39e9f6457073e8158dee91cc7d35c288 = $(`<div id="html_39e9f6457073e8158dee91cc7d35c288" style="width: 100.0%; height: 100.0%;">         <b>West Approach</b><br>         Current Speed: 17 km/h<br>         Free Flow Speed: 41 km/h<br>         Speed Ratio: 0.41<br>         Delay: 88 seconds<br>         Congestion Level: Heavy<br>         Traffic Score: 32         </div>`)[0];
+                popup_645b8f5b05f92f7c85ccf8e0e22d0704.setContent(html_39e9f6457073e8158dee91cc7d35c288);
+            
+        
+
+        marker_ffada198bf0daaa59e33302dfeec4f18.bindPopup(popup_645b8f5b05f92f7c85ccf8e0e22d0704)
+        ;
+
+        
+    
+    
+                marker_ffada198bf0daaa59e33302dfeec4f18.setIcon(icon_6dc8552b5bb3d7276e76da6954c88536);
+            
+    
+            var poly_line_e916842db1c46d52c27c1adcceae0ede = L.polyline(
+                [[33.960192828395996, -84.52790520126695], [33.961192828395994, -84.52790520126695]],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "blue", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 2}
+            ).addTo(map_5dee62c9dbf5217b1e5e5a9b4c909ebe);
+        
+    
+            var poly_line_af2bbccc4c552f49a7c98d42a9b2d398 = L.polyline(
+                [[33.960192828395996, -84.52790520126695], [33.959192828396, -84.52790520126695]],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "blue", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 2}
+            ).addTo(map_5dee62c9dbf5217b1e5e5a9b4c909ebe);
+        
+    
+            var poly_line_c26e7acd758186b0a99fc0b8ba2150cc = L.polyline(
+                [[33.960192828395996, -84.52790520126695], [33.960192828395996, -84.52690520126694]],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "blue", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 2}
+            ).addTo(map_5dee62c9dbf5217b1e5e5a9b4c909ebe);
+        
+    
+            var poly_line_f0e86550435b073093476c1da07778b4 = L.polyline(
+                [[33.960192828395996, -84.52790520126695], [33.960192828395996, -84.52890520126695]],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "blue", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 2}
+            ).addTo(map_5dee62c9dbf5217b1e5e5a9b4c909ebe);
+        
+    
+            var circle_ce0419af682109092c468bbbc4578568 = L.circle(
+                [33.960192828395996, -84.52790520126695],
+                {"bubblingMouseEvents": true, "color": "gray", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "gray", "fillOpacity": 0.1, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 100, "stroke": true, "weight": 3}
+            ).addTo(map_5dee62c9dbf5217b1e5e5a9b4c909ebe);
+        
+</script>
+</html>
