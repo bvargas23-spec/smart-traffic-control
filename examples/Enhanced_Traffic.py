@@ -791,15 +791,89 @@ def continuous_monitoring(interval=300):
         data_processor.save_data_to_csv("traffic_data_final.csv")
         print("Final data saved to traffic_data_final.csv")
 
+def continuous_monitoring_multi(intersections, interval=300):
+    """Run continuous monitoring of multiple intersections with periodic updates
+    
+    Args:
+        intersections (dict): Dictionary mapping intersection names to approach points
+        interval: Update interval in seconds (default 5 minutes)
+    """
+    # Initialize client and data processor
+    tomtom_client = TomTomClient()
+    data_processor = TrafficDataProcessor(tomtom_client)
+    visualizer = TrafficVisualizer(data_processor)
+    
+    print(f"Starting continuous traffic monitoring for {len(intersections)} intersections")
+    print(f"Update interval: {interval} seconds")
+    print("Press Ctrl+C to stop")
+    
+    try:
+        count = 0
+        while True:
+            count += 1
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            print(f"\nUpdate #{count} at {timestamp}")
+            
+            # Process each intersection
+            for intersection_name, intersection_points in intersections.items():
+                print(f"Processing {intersection_name}...")
+                
+                # Create the map for this intersection
+                m = visualizer.create_traffic_map(intersection_points, zoom_start=18)
+                
+                # Save the map with timestamp and intersection name
+                output_file = f"traffic_map_{intersection_name.replace(' ', '_')}_{timestamp}.html"
+                m.save(output_file)
+                print(f"Map saved to {output_file}")
+                
+                # Also save a copy as latest for this intersection
+                latest_file = f"traffic_map_{intersection_name.replace(' ', '_')}_latest.html"
+                m.save(latest_file)
+                print(f"Latest map for {intersection_name} saved to {latest_file}")
+            
+            # Create a multi-intersection map
+            m_multi = visualizer.create_multi_intersection_map(intersections, zoom_start=14)
+            
+            # Save the multi-intersection map
+            multi_output_file = f"multi_intersection_map_{timestamp}.html"
+            m_multi.save(multi_output_file)
+            print(f"Combined map saved to {multi_output_file}")
+            
+            # Save the latest multi-intersection map
+            multi_latest_file = "multi_intersection_map_latest.html"
+            m_multi.save(multi_latest_file)
+            print(f"Latest combined map saved to {multi_latest_file}")
+            
+            # Save data to CSV
+            data_processor.save_data_to_csv(f"traffic_data_{timestamp}.csv")
+            
+            # Save latest data
+            data_processor.save_data_to_csv("traffic_data_latest.csv")
+            
+            # Wait for next update
+            print(f"Waiting {interval} seconds until next update...")
+            time.sleep(interval)
+            
+    except KeyboardInterrupt:
+        print("\nMonitoring stopped by user")
+    except Exception as e:
+        print(f"\nError during monitoring: {e}")
+        import traceback
+        traceback.print_exc()
+    finally:
+        # Save final data export
+        data_processor.save_data_to_csv("traffic_data_final.csv")
+        print("Final data saved to traffic_data_final.csv")
 
 if __name__ == "__main__":
     # Choose one of the demo functions to run
     print("TomTom Traffic Visualization System")
     print("1. Single Intersection Demo")
     print("2. Multi-Intersection Demo")
-    print("3. Continuous Monitoring")
+    print("3. Continuous Monitoring (Single Intersection)")
+    print("4. Continuous Monitoring (Multiple Intersections)")
     
-    choice = input("Select an option (1-3): ")
+    choice = input("Select an option (1-4): ")
     
     if choice == "1":
         demo_single_intersection()
@@ -813,6 +887,31 @@ if __name__ == "__main__":
             print("Invalid interval, using default 300 seconds")
             interval = 300
         continuous_monitoring(interval)
+    elif choice == "4":
+        # Define multiple intersections
+        intersections = {
+            "Roswell & Hwy 41": {
+                "North": (33.95177778, -84.52108333),
+                "South": (33.95030556, -84.52027778),
+                "East": (33.95091667, -84.51977778),
+                "West": (33.95097222, -84.52163889)
+            },
+            "Cobb Pkwy & Hwy 120": {
+                "North": (33.94230, -84.51568),
+                "South": (33.94125, -84.51568),
+                "East": (33.94178, -84.51470),
+                "West": (33.94178, -84.51670)
+            }
+        }
+        
+        interval = input("Enter update interval in seconds (default 300): ")
+        try:
+            interval = int(interval) if interval.strip() else 300
+        except ValueError:
+            print("Invalid interval, using default 300 seconds")
+            interval = 300
+            
+        continuous_monitoring_multi(intersections, interval)
     else:
         print("Invalid choice, running single intersection demo")
         demo_single_intersection()
