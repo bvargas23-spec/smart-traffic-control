@@ -1,23 +1,23 @@
 """
-TomTom API Client
+TomTom API Client with Enhanced Capabilities
 
 This module provides interfaces to interact with TomTom APIs for traffic data collection
-at intersections. It handles authentication, request formatting, error handling,
-and basic data processing.
+at intersections, with improved request throttling, response validation, and error handling.
 
 Usage:
     client = TomTomClient(api_key='your_api_key')
     traffic_data = client.get_traffic_flow(latitude, longitude)
 """
-#this is an example commit message for tutorial purposes
 
-import requests # type: ignore
+import requests
 import json
 import time
 import logging
 import os
+import threading
 from typing import Dict, List, Any, Optional, Tuple, Union
-from dotenv import load_dotenv # type: ignore
+from datetime import datetime
+from dotenv import load_dotenv
 
 # Configure logging
 logging.basicConfig(
@@ -25,6 +25,23 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
+
+# Custom exception classes
+class TomTomApiError(Exception):
+    """Base exception for TomTom API errors."""
+    def __init__(self, message, status_code=None, response=None):
+        self.message = message
+        self.status_code = status_code
+        self.response = response
+        super().__init__(message)
+
+class RateLimitError(TomTomApiError):
+    """Exception raised when API rate limits are exceeded."""
+    pass
+
+class ValidationError(TomTomApiError):
+    """Exception raised when response validation fails."""
+    pass
 
 class TomTomClient:
     """Client for interacting with TomTom APIs to collect traffic data."""
@@ -46,12 +63,126 @@ class TomTomClient:
         """
         self.api_key = api_key
         self.session = requests.Session()
+        
+        # Request settings
         self.max_retries = 3
         self.retry_delay = 1  # seconds
+        self.request_timeout = 10  # seconds
+        
+        # Token bucket for rate limiting
+        self.tokens = 10  # Initial tokens (burst capacity)
+        self.token_rate = 0.2  # Generate 5 tokens per second (1/5)
+        self.last_token_time = time.time()
+        self.tokens_lock = threading.RLock()
+        
+        # Request tracking for rate limits
+        self.minute_requests = []
+        self.daily_requests = []
+        self.max_requests_per_minute = 60
+        self.max_requests_per_day = 2500
+        
+        # Cache for API responses
+        self.cache = {}
+        self.cache_timeout = 60  # Cache timeout in seconds
     
-    def _make_request(self, url: str, params: Dict[str, Any] = None) -> Dict[str, Any]:
+    def _refill_tokens(self) -> None:
+        """Refill tokens based on elapsed time."""
+        now = time.time()
+        elapsed = now - self.last_token_time
+        new_tokens = elapsed / self.token_rate
+        
+        if new_tokens > 0:
+            self.tokens = min(10, self.tokens + new_tokens)  # Cap at max burst capacity
+            self.last_token_time = now
+    
+    def _check_rate_limits(self) -> tuple[bool, str]:
+        """Check if we're within rate limits."""
+        now = time.time()
+        
+        # Clean up old requests
+        minute_ago = now - 60
+        self.minute_requests = [t for t in self.minute_requests if t > minute_ago]
+        
+        day_start = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0).timestamp()
+        self.daily_requests = [t for t in self.daily_requests if t > day_start]
+        
+        # Check limits
+        if self.tokens < 1:
+            return False, "Per-second rate limit reached"
+            
+        if len(self.minute_requests) >= self.max_requests_per_minute:
+            return False, f"Per-minute limit of {self.max_requests_per_minute} requests reached"
+            
+        if len(self.daily_requests) >= self.max_requests_per_day:
+            return False, f"Daily limit of {self.max_requests_per_day} requests reached"
+            
+        return True, ""
+    
+    def _throttle_request(self) -> bool:
+        """
+        Apply throttling to respect rate limits.
+        
+        Returns:
+            bool: True if request can proceed, False if rate limited
+        """
+        with self.tokens_lock:
+            self._refill_tokens()
+            can_proceed, reason = self._check_rate_limits()
+            
+            if can_proceed:
+                # Consume a token and track the request
+                self.tokens -= 1
+                now = time.time()
+                self.minute_requests.append(now)
+                self.daily_requests.append(now)
+                return True
+            else:
+                logger.warning(f"Rate limit check failed: {reason}")
+                return False
+    
+    def _validate_response(self, response: Dict[str, Any], endpoint_type: str) -> None:
+        """
+        Validate the structure of the API response.
+        
+        Args:
+            response: The API response to validate
+            endpoint_type: Type of endpoint ('flow', 'incidents', etc.)
+            
+        Raises:
+            ValidationError: If validation fails
+        """
+        if not isinstance(response, dict):
+            raise ValidationError(f"Expected dictionary response, got {type(response).__name__}")
+            
+        # Validate based on endpoint type
+        if endpoint_type == 'flow':
+            if 'flowSegmentData' not in response:
+                raise ValidationError("Missing 'flowSegmentData' in response")
+                
+            # Check for required fields in flow data
+            flow_data = response['flowSegmentData']
+            required_fields = ['currentSpeed', 'freeFlowSpeed', 'currentTravelTime', 'freeFlowTravelTime']
+            
+            for field in required_fields:
+                if field not in flow_data:
+                    logger.warning(f"Missing field '{field}' in flow data")
+                    
+        elif endpoint_type == 'incidents':
+            if 'incidents' not in response:
+                raise ValidationError("Missing 'incidents' in response")
+    
+    def _make_request(self, url: str, params: Dict[str, Any] = None, 
+                    endpoint_type: str = None) -> Dict[str, Any]:
         """
         Make an HTTP request to the TomTom API with improved error handling and retries.
+        
+        Args:
+            url: API endpoint URL
+            params: Query parameters
+            endpoint_type: Type of endpoint for validation ('flow', 'incidents', etc.)
+            
+        Returns:
+            Parsed JSON response
         """
         if params is None:
             params = {}
@@ -60,60 +191,112 @@ class TomTomClient:
         if 'key' not in params:
             params['key'] = self.api_key
             
-        # Initialize retry counter
-        retries = 0
-        last_error = None
+        # Check cache first
+        cache_key = f"{url}_{json.dumps(params, sort_keys=True)}"
+        if cache_key in self.cache:
+            timestamp, data = self.cache[cache_key]
+            if time.time() - timestamp < self.cache_timeout:
+                logger.debug(f"Using cached response for {url}")
+                return data
         
-        while retries < self.max_retries:
+        # Try multiple times with backoff
+        retries = 0
+        while retries <= self.max_retries:
             try:
-                # Log request details (without API key for security)
-                safe_params = {k: v for k, v in params.items() if k != 'key'}
-                logger.debug(f"API Request: {url} with params {safe_params}")
-                
-                response = self.session.get(url, params=params, timeout=10)
-                
-                # Check if the request was successful
-                if response.status_code == 200:
-                    return response.json()
-                elif response.status_code == 429:
-                    # Too many requests, wait and retry with backoff
-                    wait_time = self.retry_delay * (2 ** retries)
-                    logger.warning(f"Rate limit hit: {response.text}. Retrying in {wait_time} seconds...")
+                # Apply throttling
+                if not self._throttle_request():
+                    wait_time = 1.0 if retries == 0 else self.retry_delay * (2 ** retries)
+                    logger.warning(f"Rate limited. Retrying in {wait_time:.1f} seconds...")
                     time.sleep(wait_time)
                     retries += 1
                     continue
-                elif response.status_code == 400:
-                    # Bad request - log details for debugging
-                    logger.error(f"Bad request: {response.text}")
-                    # Try to return partial data if possible
-                    try:
-                        return {"error": f"{response.status_code} {response.reason}: {response.text}", 
-                                "partial_data": response.json()}
-                    except:
-                        return {"error": f"{response.status_code} {response.reason}: {response.text}"}
-                else:
-                    # Log error and raise exception
-                    logger.error(f"API Error: Status {response.status_code}, Response: {response.text}")
-                    last_error = f"{response.status_code} {response.reason}: {response.text}"
+                
+                # Log safe request details (without API key)
+                safe_params = {k: v for k, v in params.items() if k != 'key'}
+                logger.debug(f"API Request: {url} with params {safe_params}")
+                
+                # Make the request
+                response = self.session.get(url, params=params, timeout=self.request_timeout)
+                
+                # Check if the request was successful
+                if response.status_code == 200:
+                    # Parse and validate the response
+                    data = response.json()
+                    
+                    # Validate the response structure if an endpoint type is provided
+                    if endpoint_type:
+                        try:
+                            self._validate_response(data, endpoint_type)
+                        except ValidationError as e:
+                            logger.warning(f"Response validation warning: {str(e)}")
+                    
+                    # Cache the response
+                    self.cache[cache_key] = (time.time(), data)
+                    return data
+                    
+                elif response.status_code == 429:
+                    # Rate limit exceeded, get retry time from header if available
+                    retry_after = response.headers.get('Retry-After')
+                    wait_time = int(retry_after) if retry_after and retry_after.isdigit() else self.retry_delay * (2 ** retries)
+                    
+                    logger.warning(f"Rate limit hit (429). Retrying in {wait_time} seconds...")
+                    time.sleep(wait_time)
                     retries += 1
-                    if retries < self.max_retries:
-                        time.sleep(self.retry_delay * (2 ** retries))
                     continue
                     
-            except requests.exceptions.RequestException as e:
-                logger.error(f"Request failed: {e}")
-                last_error = str(e)
-                # Handle network errors with retry
-                retries += 1
-                if retries < self.max_retries:
-                    time.sleep(self.retry_delay * (2 ** retries))
-                    continue
                 else:
-                    return {"error": f"Failed after {self.max_retries} retries: {e}"}
+                    # Handle other error cases
+                    error_message = f"HTTP Error {response.status_code}: {response.reason}"
+                    
+                    # Try to get more details from the response
+                    try:
+                        error_data = response.json()
+                        if isinstance(error_data, dict):
+                            error_detail = (
+                                error_data.get('errorText') or
+                                error_data.get('detailedError', {}).get('message') or
+                                error_data.get('error', {}).get('description')
+                            )
+                            if error_detail:
+                                error_message = f"{error_message} - {error_detail}"
+                    except (ValueError, KeyError):
+                        if response.text:
+                            error_message = f"{error_message} - {response.text[:200]}"
+                    
+                    logger.error(error_message)
+                    
+                    # Certain error codes should not be retried
+                    if response.status_code in [400, 401, 403]:
+                        return {"error": error_message}
+                    
+                    # Otherwise retry
+                    retries += 1
+                    if retries <= self.max_retries:
+                        wait_time = self.retry_delay * (2 ** retries)
+                        logger.info(f"Retrying in {wait_time} seconds...")
+                        time.sleep(wait_time)
+                    continue
+                
+            except requests.exceptions.Timeout:
+                logger.warning(f"Request timed out. Retry {retries+1}/{self.max_retries+1}")
+                retries += 1
+                if retries <= self.max_retries:
+                    wait_time = self.retry_delay * (2 ** retries)
+                    time.sleep(wait_time)
+                continue
+                
+            except requests.exceptions.RequestException as e:
+                logger.error(f"Request failed: {str(e)}")
+                retries += 1
+                if retries <= self.max_retries:
+                    wait_time = self.retry_delay * (2 ** retries)
+                    logger.info(f"Retrying in {wait_time} seconds...")
+                    time.sleep(wait_time)
+                continue
                 
         # If we get here, all retries failed
-        return {"error": f"Failed after {self.max_retries} retries: {last_error}"}
-
+        return {"error": f"Failed after {self.max_retries} retries"}
+    
     def get_traffic_flow(self, latitude: float, longitude: float, zoom: int = 10) -> Dict[str, Any]:
         """
         Get traffic flow data for a specific point.
@@ -132,7 +315,7 @@ class TomTomClient:
             'unit': 'KMPH'  # Options: KMPH, MPH
         }
         
-        response = self._make_request(url, params)
+        response = self._make_request(url, params, endpoint_type='flow')
         logger.info(f"Received traffic flow data for {latitude}, {longitude}")
         return response
 
@@ -162,7 +345,7 @@ class TomTomClient:
             'timeValidityFilter': 'present'  
         }
         
-        response = self._make_request(url, params)
+        response = self._make_request(url, params, endpoint_type='incidents')
         logger.info(f"Received traffic incidents data for bbox {bbox_str}")
         return response
 
@@ -248,7 +431,7 @@ class TomTomClient:
             "intersection": {
                 "latitude": intersection_lat,
                 "longitude": intersection_lon,
-                "timestamp": time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
+                "timestamp": datetime.now().isoformat()
             },
             "approaches": {},
             "incidents": incidents_data
@@ -279,7 +462,7 @@ class TomTomClient:
                 summary["approaches"][direction] = {"error": "No flow data available"}
                 
         return summary
-
+    
     def calculate_route(self, points: List[Tuple[float, float]]) -> Dict[str, Any]:
         """
         Calculate a route between a series of waypoints.
@@ -330,96 +513,109 @@ class TomTomClient:
         logger.info(f"Snapped {len(points)} points to roads")
         return response
     
-def test_api_fixes():
-    """
-    Test the fixes to the TomTom API integration.
-    """
-    print("\n=== Testing API Fixes ===")
+    def clear_cache(self) -> None:
+        """Clear the response cache."""
+        self.cache = {}
+        logger.info("Cache cleared")
     
-    # Load environment variables from .env file
-    load_dotenv()
-    
-    # Get API key from environment variables
-    API_KEY = os.getenv("TOMTOM_API_KEY")
-    if not API_KEY:
-        print("❌ No API key found. Please set TOMTOM_API_KEY in your .env file.")
-        return
-    
-    # Create a client with the updated code
-    client = TomTomClient(api_key=API_KEY)
-    
-    # North Marietta Pkwy Ne & Cobb Pkwy N intersection
-    lat = 33.960192828395996
-    lon = -84.52790520126695
-    
-    # Test traffic incidents with a smaller bounding box
-    print("\nTesting Traffic Incidents API with smaller bounding box...")
-    bbox = (
-        lon - 0.003,  # min_lon
-        lat - 0.003,  # min_lat
-        lon + 0.003,  # max_lon
-        lat + 0.003   # max_lat
-    )
-    
-    incidents_data = client.get_traffic_incidents_in_bbox(bbox)
-    if "error" in incidents_data:
-        print(f"❌ Error getting incidents: {incidents_data['error']}")
-    else:
-        print(f"✅ Successfully retrieved incidents data")
+    def get_rate_limit_stats(self) -> Dict[str, Any]:
+        """
+        Get current rate limiting statistics.
         
-    # Test traffic summary
-    print("\nTesting Traffic Summary...")
-    summary = client.get_traffic_summary(lat, lon)
-    
-    # Check if we got valid data for approaches
-    approaches = summary["approaches"]
-    success = True
-    for direction, data in approaches.items():
-        if "error" in data:
-            print(f"❌ Error getting data for {direction} approach: {data['error']}")
-            success = False
-            continue
+        Returns:
+            dict: Current rate limit statistics
+        """
+        with self.tokens_lock:
+            self._refill_tokens()
             
-        if "current_speed" not in data:
-            print(f"❌ No current_speed found for {direction} approach")
-            success = False
-            continue
+            # Clean up old requests for accurate stats
+            now = time.time()
+            minute_ago = now - 60
+            self.minute_requests = [t for t in self.minute_requests if t > minute_ago]
             
-        print(f"✅ {direction}: Current Speed={data['current_speed']}kph, Free Flow={data['free_flow_speed']}kph")
+            day_start = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0).timestamp()
+            self.daily_requests = [t for t in self.daily_requests if t > day_start]
+            
+            return {
+                "tokens_available": self.tokens,
+                "minute_requests": len(self.minute_requests),
+                "minute_limit": self.max_requests_per_minute,
+                "daily_requests": len(self.daily_requests),
+                "daily_limit": self.max_requests_per_day
+            }
     
-    # Check incident data
-    if "error" in summary["incidents"]:
-        print(f"❌ Incidents error: {summary['incidents']['error']}")
-    else:
-        print(f"✅ Successfully retrieved incidents data in summary")
-    
-    # Save the summary to a file for inspection
-    with open("fixed_traffic_summary.json", "w") as f:
-        json.dump(summary, f, indent=2)
+    def get_cache_info(self) -> Dict[str, Any]:
+        """
+        Get information about the current cache state.
         
-    print("\nFull traffic summary saved to fixed_traffic_summary.json")
-    
-    return success
+        Returns:
+            dict: Cache statistics
+        """
+        current_time = time.time()
+        
+        # Count active vs expired cache entries
+        active_entries = 0
+        expired_entries = 0
+        
+        for timestamp, _ in self.cache.values():
+            if current_time - timestamp < self.cache_timeout:
+                active_entries += 1
+            else:
+                expired_entries += 1
+        
+        return {
+            "total_entries": len(self.cache),
+            "active_entries": active_entries,
+            "expired_entries": expired_entries,
+            "cache_timeout": self.cache_timeout
+        }
 
-# Example usage (will only run if script is executed directly)
+
+# Example usage
 if __name__ == "__main__":
-    # Load environment variables from .env file
+    # Load API key from environment variable
+    import os
+    from dotenv import load_dotenv
+    
     load_dotenv()
     
-    # Get API key from environment variables
     API_KEY = os.getenv("TOMTOM_API_KEY")
     if not API_KEY:
         raise ValueError("No API key found. Please set TOMTOM_API_KEY in your .env file.")
     
-    # Create a client
+    # Create client
     client = TomTomClient(api_key=API_KEY)
     
-    # Run tests
-    test_api_fixes()
-    
-    # Or get a specific traffic summary
-    # North Marietta Pkwy Ne & Cobb Pkwy N intersection
-    # INTERSECTION_LAT = 33.960192828395996
-    # INTERSECTION_LON = -84.52790520126695
-    # summary = client.get_traffic_summary(INTERSECTION_LAT, INTERSECTION_LON)
-    # print(json.dumps(summary, indent=2))
+    try:
+        # Example: North Marietta Pkwy Ne & Cobb Pkwy N intersection
+        lat = 33.960192828395996
+        lon = -84.52790520126695
+        
+        flow_data = client.get_traffic_flow(lat, lon)
+        
+        if "error" in flow_data:
+            print(f"Error: {flow_data['error']}")
+        else:
+            segment = flow_data.get("flowSegmentData", {})
+            print("\nTraffic Flow Data:")
+            print(f"Current Speed: {segment.get('currentSpeed')} kph")
+            print(f"Free Flow Speed: {segment.get('freeFlowSpeed')} kph")
+            print(f"Current Travel Time: {segment.get('currentTravelTime')} seconds")
+            print(f"Confidence: {segment.get('confidence')}")
+        
+        # Get rate limit stats
+        stats = client.get_rate_limit_stats()
+        print("\nRate Limit Stats:")
+        print(f"Tokens available: {stats['tokens_available']}")
+        print(f"Requests in last minute: {stats['minute_requests']}/{stats['minute_limit']}")
+        print(f"Requests today: {stats['daily_requests']}/{stats['daily_limit']}")
+        
+        # Get cache info
+        cache_info = client.get_cache_info()
+        print("\nCache Info:")
+        print(f"Total entries: {cache_info['total_entries']}")
+        print(f"Active entries: {cache_info['active_entries']}")
+        print(f"Expired entries: {cache_info['expired_entries']}")
+        
+    except Exception as e:
+        print(f"Error: {e}")
