@@ -11,8 +11,8 @@ the decision-making algorithms for traffic control.
 
 import json
 import logging
-import numpy as np
-import pandas as pd
+import numpy as np # type: ignore
+import pandas as pd # type: ignore
 from datetime import datetime
 from typing import Dict, List, Any, Optional, Tuple, Union
 import os
