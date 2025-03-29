@@ -528,12 +528,23 @@ class DataProcessor:
         if total_assigned != cycle_length:
             # Distribute the difference proportionally
             diff = cycle_length - total_assigned
-            for group in sorted(green_times.keys(), key=lambda k: green_times[k], reverse=(diff < 0)):
-                if abs(diff) > 0:
+
+            # Keep adjusting until the difference is distributed or we can't adjust anymore
+
+            while abs(diff) > 0:
+                adjusted = False
+                for group in sorted(green_times.keys(), key=lambda k: green_times[k], reverse=(diff > 0)):
                     adjustment = 1 if diff > 0 else -1
                     if min_phase_time <= green_times[group] + adjustment <= max_phase_time:
                         green_times[group] += adjustment
                         diff -= adjustment
+                        adjusted = True
+                        if diff == 0:
+                            break
+        
+                # If we couldn't make any adjustments in this iteration, break the loop
+                if not adjusted:
+                    break
         
         # Construct the final timing recommendations
         timing_recommendations = {
