@@ -1,81 +1,81 @@
 {
   "intersection": {
-    "latitude": 33.9611,
-    "longitude": -84.52845,
-    "timestamp": "2025-03-26 22:01:06"
+    "latitude": 33.960192828395996,
+    "longitude": -84.52790520126695,
+    "timestamp": "2025-03-28T23:53:36.821198"
   },
   "approaches": {
     "North": {
-      "current_speed": 51,
-      "free_flow_speed": 63,
-      "current_travel_time": 83,
-      "free_flow_travel_time": 67,
+      "current_speed": 61,
+      "free_flow_speed": 61,
+      "current_travel_time": 69,
+      "free_flow_travel_time": 69,
       "confidence": 1,
       "road_closure": false,
-      "delay": 16
+      "delay": 0
     },
     "South": {
-      "current_speed": 41,
-      "free_flow_speed": 54,
-      "current_travel_time": 101,
-      "free_flow_travel_time": 76,
+      "current_speed": 61,
+      "free_flow_speed": 61,
+      "current_travel_time": 73,
+      "free_flow_travel_time": 73,
       "confidence": 1,
       "road_closure": false,
-      "delay": 25
+      "delay": 0
     },
     "East": {
-      "current_speed": 51,
-      "free_flow_speed": 63,
-      "current_travel_time": 83,
-      "free_flow_travel_time": 67,
+      "current_speed": 43,
+      "free_flow_speed": 43,
+      "current_travel_time": 74,
+      "free_flow_travel_time": 74,
       "confidence": 1,
       "road_closure": false,
-      "delay": 16
+      "delay": 0
     },
     "West": {
       "current_speed": 41,
-      "free_flow_speed": 54,
-      "current_travel_time": 101,
-      "free_flow_travel_time": 76,
+      "free_flow_speed": 41,
+      "current_travel_time": 62,
+      "free_flow_travel_time": 62,
       "confidence": 1,
       "road_closure": false,
-      "delay": 25
+      "delay": 0
     },
     "Northeast": {
-      "current_speed": 51,
-      "free_flow_speed": 63,
-      "current_travel_time": 83,
-      "free_flow_travel_time": 67,
+      "current_speed": 27,
+      "free_flow_speed": 27,
+      "current_travel_time": 7,
+      "free_flow_travel_time": 7,
       "confidence": 1,
       "road_closure": false,
-      "delay": 16
+      "delay": 0
     },
     "Northwest": {
-      "current_speed": 51,
-      "free_flow_speed": 63,
-      "current_travel_time": 83,
-      "free_flow_travel_time": 67,
+      "current_speed": 61,
+      "free_flow_speed": 61,
+      "current_travel_time": 69,
+      "free_flow_travel_time": 69,
       "confidence": 1,
       "road_closure": false,
-      "delay": 16
+      "delay": 0
     },
     "Southeast": {
-      "current_speed": 51,
-      "free_flow_speed": 63,
-      "current_travel_time": 83,
-      "free_flow_travel_time": 67,
-      "confidence": 1,
+      "current_speed": 5,
+      "free_flow_speed": 6,
+      "current_travel_time": 108,
+      "free_flow_travel_time": 90,
+      "confidence": 0.91,
       "road_closure": false,
-      "delay": 16
+      "delay": 18
     },
     "Southwest": {
-      "current_speed": 41,
-      "free_flow_speed": 54,
-      "current_travel_time": 101,
-      "free_flow_travel_time": 76,
+      "current_speed": 43,
+      "free_flow_speed": 43,
+      "current_travel_time": 74,
+      "free_flow_travel_time": 74,
       "confidence": 1,
       "road_closure": false,
-      "delay": 25
+      "delay": 0
     }
   },
   "incidents": {

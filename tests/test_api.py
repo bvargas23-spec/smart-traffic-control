@@ -8,6 +8,7 @@ fetches traffic data from TomTom APIs.
 import os
 import sys
 import json
+import time
 from dotenv import load_dotenv # type: ignore
 import traceback
 
@@ -195,6 +196,54 @@ def test_traffic_summary(client):
         traceback.print_exc()  # Add this to show detailed error
         return False
 
+def test_caching(client):
+    """Test that the caching mechanism works correctly."""
+    print("\n=== Testing Caching ===")
+    
+    # North Marietta Pkwy Ne & Cobb Pkwy N intersection
+    lat = 33.960192828395996
+    lon = -84.52790520126695
+    
+    try:
+        # First request should hit the API
+        start_time = time.time()
+        flow_data_1 = client.get_traffic_flow(lat, lon)
+        first_request_time = time.time() - start_time
+        
+        # Second request should use cached result
+        start_time = time.time()
+        flow_data_2 = client.get_traffic_flow(lat, lon)
+        second_request_time = time.time() - start_time
+        
+        # Check that both responses are the same
+        if flow_data_1 == flow_data_2:
+            print("✅ Cache returned the same data")
+        else:
+            print("❌ Cache returned different data")
+            return False
+        
+        # Check that the second request was significantly faster
+        if second_request_time < first_request_time / 2:
+            print(f"✅ Cached request was faster: {second_request_time:.3f}s vs {first_request_time:.3f}s")
+        else:
+            print(f"❌ Cached request was not significantly faster: {second_request_time:.3f}s vs {first_request_time:.3f}s")
+            return False
+            
+        # Check cache info
+        cache_info = client.get_cache_info()
+        if cache_info["active_entries"] > 0:
+            print(f"✅ Cache has {cache_info['active_entries']} active entries")
+        else:
+            print("❌ Cache has no active entries")
+            return False
+            
+        return True
+        
+    except Exception as e:
+        print(f"❌ Error testing cache: {e}")
+        traceback.print_exc()
+        return False
+    
 # Main test runner
 if __name__ == "__main__":
     # Load environment variables from .env file
