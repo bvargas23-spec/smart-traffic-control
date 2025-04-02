@@ -1,5 +1,0 @@
-lat,lon,name,timestamp,current_speed,free_flow_speed,current_travel_time,free_flow_travel_time,delay,confidence,road_closure,speed_ratio,congestion_level,traffic_score
-33.95177778,-84.52108333,North Approach,2025-03-28T15:22:12.341218,49,60,92,75,17,1,False,0.8166666666666667,1,82
-33.95030556,-84.52027778,South Approach,2025-03-28T15:22:12.583591,7,7,68,68,0,1,False,1.0,0,100
-33.95091667,-84.51977778,East Approach,2025-03-28T15:22:12.807902,11,45,222,54,168,1,False,0.24444444444444444,4,24
-33.95097222,-84.52163889,West Approach,2025-03-28T15:22:13.017213,29,45,172,110,62,1,False,0.6444444444444445,2,64
