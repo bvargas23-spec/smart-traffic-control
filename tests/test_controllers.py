@@ -13,10 +13,19 @@ try:
 except ImportError:
     # Create dummy classes for testing purposes if the real module isn't available
     class SignalController:
-        pass
+        def __init__(self, hardware_interface=None):
+            self.hardware_interface = hardware_interface
+            self.status = ControllerStatus.NORMAL
+            self.signals = []
+            self.phases = []
+            self.intersection_id = None
+            self.sync_partners = []
+            self.sync_clock_offset = 0
     
     class SensorController:
-        pass
+        def __init__(self, sensor_interface=None):
+            self.sensor_interface = sensor_interface
+            self.fault_log = {}
     
     class ControllerStatus:
         NORMAL = "NORMAL"
