@@ -656,5 +656,344 @@ class TestPredictionModel(unittest.TestCase):
     
     def test_time_of_day_prediction(self):
         """Test hourly traffic volume prediction."""
-        # Create data with hourly pattern
-        dates = pd.date_range(start='2025-
+    # Create data with hourly pattern
+    dates = pd.date_range(start='2025-01-01', periods=24, freq='H')
+    hourly_data = []
+    
+    # Create typical hourly pattern
+    hourly_pattern = [
+        300, 200, 150, 100, 150, 300,  # Midnight to 6am
+        700, 1200, 1100, 900, 800, 750,  # 6am to noon
+        800, 850, 900, 950, 1100, 1300,  # Noon to 6pm
+        1000, 800, 700, 600, 500, 400   # 6pm to midnight
+    ]
+    
+    for i, date in enumerate(dates):
+        hourly_data.append({
+            'datetime': date,
+            'volume': hourly_pattern[i] + np.random.normal(0, 50),
+            'hour': date.hour
+        })
+    
+    # Create DataFrame and train model
+    hourly_df = pd.DataFrame(hourly_data)
+    hourly_model = PredictionModel(time_granularity='hourly')
+    hourly_model.train(hourly_df)
+    
+    # Test predictions for different hours
+    morning_rush = hourly_model.predict_volume_by_hour(8)  # 8am
+    afternoon_rush = hourly_model.predict_volume_by_hour(17)  # 5pm
+    night_time = hourly_model.predict_volume_by_hour(2)  # 2am
+    
+    # Verify predictions match expected pattern
+    self.assertGreater(morning_rush, 1000)
+    self.assertGreater(afternoon_rush, 1000)
+    self.assertLess(night_time, 300)
+    
+    # Verify rush hour detection
+    rush_hours = hourly_model.identify_peak_hours(threshold=1000)
+    self.assertIn(8, rush_hours)
+    self.assertIn(17, rush_hours)
+    self.assertNotIn(2, rush_hours)
+
+def test_multifactor_prediction(self):
+    """Test prediction with multiple factors combined."""
+    # Create complex dataset with multiple factors
+    dates = pd.date_range(start='2025-01-01', periods=60, freq='D')
+    complex_data = []
+    
+    for date in dates:
+        # Base volume depends on weekday/weekend
+        if date.weekday() < 5:  # Weekday
+            base_volume = 1000
+        else:  # Weekend
+            base_volume = 600
+        
+        # Weather factor (random assignment)
+        weather = np.random.choice(['sunny', 'rainy', 'snowy'], p=[0.6, 0.3, 0.1])
+        if weather == 'rainy':
+            weather_factor = 0.9
+        elif weather == 'snowy':
+            weather_factor = 0.7
+        else:
+            weather_factor = 1.0
+            
+        # School factor (in session or break)
+        # Assume winter break for first 5 days, spring break for days 40-45
+        if date.day <= 5 or (40 <= date.day <= 45):
+            school_factor = 0.8  # Less traffic during school breaks
+        else:
+            school_factor = 1.0
+            
+        # Special events (random large events)
+        has_event = np.random.random() < 0.1  # 10% chance of special event
+        event_factor = 1.5 if has_event else 1.0
+        
+        # Calculate final volume with all factors
+        volume = base_volume * weather_factor * school_factor * event_factor
+        
+        # Add noise
+        volume += np.random.normal(0, 50)
+        
+        complex_data.append({
+            'date': date,
+            'volume': int(volume),
+            'weather': weather,
+            'school_break': 1 if (date.day <= 5 or (40 <= date.day <= 45)) else 0,
+            'special_event': 1 if has_event else 0
+        })
+    
+    # Create DataFrame
+    complex_df = pd.DataFrame(complex_data)
+    
+    # Train a multifactor model
+    complex_model = PredictionModel(features=['weather', 'school_break', 'special_event'])
+    complex_model.train(complex_df)
+    
+    # Test prediction with various combinations
+    test_date = pd.Timestamp('2025-03-01')  # A date not in training set
+    
+    # Base prediction (weekday, sunny, no school break, no event)
+    base_pred = complex_model.predict_volume(
+        test_date, 
+        weather='sunny', 
+        school_break=0, 
+        special_event=0
+    )
+    
+    # Prediction with rain
+    rain_pred = complex_model.predict_volume(
+        test_date, 
+        weather='rainy', 
+        school_break=0, 
+        special_event=0
+    )
+    
+    # Prediction with school break
+    school_pred = complex_model.predict_volume(
+        test_date, 
+        weather='sunny', 
+        school_break=1, 
+        special_event=0
+    )
+    
+    # Prediction with special event
+    event_pred = complex_model.predict_volume(
+        test_date, 
+        weather='sunny', 
+        school_break=0, 
+        special_event=1
+    )
+    
+    # Prediction with all factors
+    all_factors_pred = complex_model.predict_volume(
+        test_date, 
+        weather='rainy', 
+        school_break=1, 
+        special_event=1
+    )
+    
+    # Verify individual factor impacts
+    self.assertLess(rain_pred, base_pred)
+    self.assertLess(school_pred, base_pred)
+    self.assertGreater(event_pred, base_pred)
+    
+    # Verify combined effects
+    self.assertLess(all_factors_pred, event_pred)  # Rain and school break reduce volume
+    self.assertGreater(all_factors_pred, rain_pred)  # Event increases volume
+
+def test_prediction_confidence_intervals(self):
+    """Test that the model can generate confidence intervals for predictions."""
+    # Train model on historical data
+    model = PredictionModel(confidence_intervals=True)
+    model.train(self.historical_data)
+    
+    # Get prediction with confidence intervals
+    test_date = pd.Timestamp('2025-04-01')
+    prediction, lower_bound, upper_bound = model.predict_with_confidence(test_date)
+    
+    # Verify prediction is within bounds
+    self.assertLessEqual(lower_bound, prediction)
+    self.assertLessEqual(prediction, upper_bound)
+    
+    # Verify reasonable interval width (not too narrow or wide)
+    interval_width = upper_bound - lower_bound
+    prediction_range = 0.3 * prediction  # Expecting roughly ±15% interval
+    
+    self.assertGreater(interval_width, 0.1 * prediction)  # Not too narrow
+    self.assertLess(interval_width, 0.5 * prediction)  # Not too wide
+
+def test_anomaly_detection_in_prediction(self):
+    """Test ability to detect anomalies in actual vs predicted traffic."""
+    # Create test data with some anomalies
+    dates = pd.date_range(start='2025-01-01', periods=30, freq='D')
+    volumes = []
+    
+    for i, date in enumerate(dates):
+        # Base pattern
+        if date.weekday() < 5:
+            base_volume = 1000
+        else:
+            base_volume = 600
+            
+        # Add anomalies on specific days
+        if i == 10:  # Sudden spike
+            volume = base_volume * 2
+        elif i == 20:  # Sudden drop
+            volume = base_volume * 0.5
+        else:
+            volume = base_volume + np.random.normal(0, 50)
+            
+        volumes.append(int(volume))
+    
+    anomaly_df = pd.DataFrame({'date': dates, 'volume': volumes})
+    
+    # Split into training (first 25 days) and test (last 5 days including one anomaly)
+    train_df = anomaly_df.iloc[:25]
+    test_df = anomaly_df.iloc[25:]
+    
+    # Train model
+    model = PredictionModel()
+    model.train(train_df)
+    
+    # Test anomaly detection
+    anomalies = model.detect_anomalies(test_df, threshold=1.5)
+    
+    # Verify anomaly detection
+    self.assertGreaterEqual(len(anomalies), 0)
+    
+    # If there was an anomaly in the test period, verify it was detected
+    if any(abs(row['volume'] - model.predict_volume(row['date'])) > 
+           threshold * model.prediction_std for _, row in test_df.iterrows()):
+        self.assertGreater(len(anomalies), 0)
+
+def test_transfer_learning_between_intersections(self):
+    """Test transferring a prediction model from one intersection to another similar one."""
+    # Create data for two similar intersections
+    dates = pd.date_range(start='2025-01-01', periods=60, freq='D')
+    
+    # Intersection 1 data (source)
+    int1_data = []
+    for date in dates:
+        # Base pattern
+        if date.weekday() < 5:
+            base_volume = 1000
+        else:
+            base_volume = 600
+            
+        # Add noise
+        volume = base_volume + np.random.normal(0, 50)
+        int1_data.append({'date': date, 'volume': int(volume), 'intersection_id': 1})
+    
+    # Intersection 2 data (target) - similar pattern but 20% higher volume
+    int2_data = []
+    for date in dates[:30]:  # Only 30 days of data for int2 (less history)
+        # Base pattern - same weekly pattern, different magnitude
+        if date.weekday() < 5:
+            base_volume = 1200  # 20% higher
+        else:
+            base_volume = 720   # 20% higher
+            
+        # Add noise
+        volume = base_volume + np.random.normal(0, 60)
+        int2_data.append({'date': date, 'volume': int(volume), 'intersection_id': 2})
+    
+    # Create DataFrames
+    int1_df = pd.DataFrame(int1_data)
+    int2_df = pd.DataFrame(int2_data)
+    
+    # Train source model
+    source_model = PredictionModel()
+    source_model.train(int1_df)
+    
+    # Test predictions on target intersection with and without transfer learning
+    
+    # Without transfer learning - train from scratch on target data
+    basic_model = PredictionModel()
+    basic_model.train(int2_df)
+    
+    # With transfer learning - initialize with source model parameters
+    transfer_model = PredictionModel()
+    transfer_model.transfer_from(source_model, scaling_factor=1.2)
+    transfer_model.fine_tune(int2_df)  # Fine-tune on target data
+    
+    # Make predictions on future dates for target intersection
+    test_dates = pd.date_range(start='2025-03-01', periods=7, freq='D')
+    
+    # Calculate prediction error with and without transfer learning
+    basic_errors = []
+    transfer_errors = []
+    
+    for date in test_dates:
+        # True volume (synthetic) following the pattern
+        if date.weekday() < 5:
+            true_volume = 1200 + np.random.normal(0, 60)
+        else:
+            true_volume = 720 + np.random.normal(0, 60)
+        
+        # Predictions
+        basic_pred = basic_model.predict_volume(date)
+        transfer_pred = transfer_model.predict_volume(date)
+        
+        # Calculate absolute errors
+        basic_errors.append(abs(basic_pred - true_volume))
+        transfer_errors.append(abs(transfer_pred - true_volume))
+    
+    # Verify transfer learning improves accuracy
+    avg_basic_error = np.mean(basic_errors)
+    avg_transfer_error = np.mean(transfer_errors)
+    
+    self.assertLess(avg_transfer_error, avg_basic_error)
+
+def test_ensemble_prediction(self):
+    """Test ensemble prediction combining multiple models."""
+    # Train three different models on the same data
+    model1 = PredictionModel(algorithm='linear')  # Linear regression
+    model2 = PredictionModel(algorithm='forest')  # Random forest
+    model3 = PredictionModel(algorithm='neural')  # Neural network
+    
+    model1.train(self.historical_data)
+    model2.train(self.historical_data)
+    model3.train(self.historical_data)
+    
+    # Create an ensemble model
+    ensemble = PredictionModel(algorithm='ensemble')
+    ensemble.add_models([model1, model2, model3], weights=[0.3, 0.5, 0.2])
+    
+    # Make predictions with all models
+    test_date = pd.Timestamp('2025-04-01')
+    pred1 = model1.predict_volume(test_date)
+    pred2 = model2.predict_volume(test_date)
+    pred3 = model3.predict_volume(test_date)
+    ensemble_pred = ensemble.predict_volume(test_date)
+    
+    # Calculate expected weighted average
+    expected_pred = 0.3*pred1 + 0.5*pred2 + 0.2*pred3
+    
+    # Verify ensemble prediction is weighted average of individual predictions
+    self.assertAlmostEqual(ensemble_pred, expected_pred, delta=1)
+    
+    # Verify ensemble prediction accuracy on test data
+    test_data = self.historical_data.iloc[-10:]  # Last 10 days
+    
+    individual_errors = []
+    ensemble_errors = []
+    
+    for _, row in test_data.iterrows():
+        date = row['date']
+        actual = row['volume']
+        
+        # Get individual and ensemble predictions
+        preds = [model.predict_volume(date) for model in [model1, model2, model3]]
+        ens_pred = ensemble.predict_volume(date)
+        
+        # Calculate errors
+        individual_errors.append([abs(pred - actual) for pred in preds])
+        ensemble_errors.append(abs(ens_pred - actual))
+    
+    # Calculate average errors
+    avg_ind_errors = [np.mean([e[i] for e in individual_errors]) for i in range(3)]
+    avg_ens_error = np.mean(ensemble_errors)
+    
+    # Verify ensemble error is better than at least one individual model
+    self.assertLessEqual(avg_ens_error, max(avg_ind_errors))
