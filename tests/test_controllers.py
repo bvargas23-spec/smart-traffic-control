@@ -9,7 +9,7 @@ import threading
 # Assuming your controllers are in a module called "controllers"
 # We'll use patch to mock them during testing
 try:
-    from traffic_control.controllers import SignalController, SensorController, ControllerStatus # type: ignore
+    from controllers import SignalController, SensorController, ControllerStatus # type: ignore
 except ImportError:
     # Create dummy classes for testing purposes if the real module isn't available
     class SignalController:
