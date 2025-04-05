@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<edges xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/edges_file.xsd">
+    <edge id="NtoCenter" from="N" to="center" priority="1" numLanes="2"/>
+    <edge id="CentertoN" from="center" to="N" priority="1" numLanes="2"/>
+    <edge id="StoCenter" from="S" to="center" priority="1" numLanes="2"/>
+    <edge id="CentertoS" from="center" to="S" priority="1" numLanes="2"/>
+    <edge id="EtoCenter" from="E" to="center" priority="1" numLanes="2"/>
+    <edge id="CentertoE" from="center" to="E" priority="1" numLanes="2"/>
+    <edge id="WtoCenter" from="W" to="center" priority="1" numLanes="2"/>
+    <edge id="CentertoW" from="center" to="W" priority="1" numLanes="2"/>
+</edges>

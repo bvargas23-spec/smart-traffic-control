@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<connections xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/connections_file.xsd">
+    <!-- North to South (straight) -->
+    <connection from="NtoCenter" to="CentertoS" fromLane="1" toLane="1"/>
+    <!-- North to East (right) -->
+    <connection from="NtoCenter" to="CentertoE" fromLane="0" toLane="0"/>
+    <!-- North to West (left) -->
+    <connection from="NtoCenter" to="CentertoW" fromLane="1" toLane="1"/>
+    
+    <!-- South to North (straight) -->
+    <connection from="StoCenter" to="CentertoN" fromLane="1" toLane="1"/>
+    <!-- South to West (right) -->
+    <connection from="StoCenter" to="CentertoW" fromLane="0" toLane="0"/>
+    <!-- South to East (left) -->
+    <connection from="StoCenter" to="CentertoE" fromLane="1" toLane="1"/>
+    
+    <!-- East to West (straight) -->
+    <connection from="EtoCenter" to="CentertoW" fromLane="1" toLane="1"/>
+    <!-- East to North (right) -->
+    <connection from="EtoCenter" to="CentertoN" fromLane="0" toLane="0"/>
+    <!-- East to South (left) -->
+    <connection from="EtoCenter" to="CentertoS" fromLane="1" toLane="1"/>
+    
+    <!-- West to East (straight) -->
+    <connection from="WtoCenter" to="CentertoE" fromLane="1" toLane="1"/>
+    <!-- West to South (right) -->
+    <connection from="WtoCenter" to="CentertoS" fromLane="0" toLane="0"/>
+    <!-- West to North (left) -->
+    <connection from="WtoCenter" to="CentertoN" fromLane="1" toLane="1"/>
+</connections>

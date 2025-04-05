@@ -122,12 +122,13 @@ def create_basic_intersection_xml(intersection_id, lat, lon, output_dir):
     tls_xml = f"""<?xml version="1.0" encoding="UTF-8"?>
 <additional xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/additional_file.xsd">
     <tlLogic id="center" type="static" programID="0" offset="0">
-        <phase duration="31" state="GGrrGGrr"/> <!-- North-South green -->
-        <phase duration="4" state="yyrryyrr"/> <!-- North-South yellow -->
-        <phase duration="31" state="rrGGrrGG"/> <!-- East-West green -->
-        <phase duration="4" state="rryyrryy"/> <!-- East-West yellow -->
+        <phase duration="31" state="GGggrrrrGGggrrrr"/> <!-- North-South green -->
+        <phase duration="4" state="yyggrrrryyggRRRR"/> <!-- North-South yellow -->
+        <phase duration="31" state="rrrrGGggrrrrGGgg"/> <!-- East-West green -->
+        <phase duration="4" state="rrrryyggrrrryygg"/> <!-- East-West yellow -->
     </tlLogic>
 </additional>
+"""
 """
     
     # Write files
