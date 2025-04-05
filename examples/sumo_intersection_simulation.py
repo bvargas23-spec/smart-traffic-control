@@ -129,7 +129,6 @@ def create_basic_intersection_xml(intersection_id, lat, lon, output_dir):
     </tlLogic>
 </additional>
 """
-"""
     
     # Write files
     with open(os.path.join(output_dir, f"{intersection_id}.nod.xml"), 'w') as f:
@@ -288,10 +287,10 @@ def generate_adaptive_tls_program(approaches, output_file):
     tls_xml = f"""<?xml version="1.0" encoding="UTF-8"?>
 <additional xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/additional_file.xsd">
     <tlLogic id="center" type="static" programID="adaptive" offset="0">
-        <phase duration="{ns_green}" state="GGrrGGrr"/> <!-- North-South green -->
-        <phase duration="{yellow_time}" state="yyrryyrr"/> <!-- North-South yellow -->
-        <phase duration="{ew_green}" state="rrGGrrGG"/> <!-- East-West green -->
-        <phase duration="{yellow_time}" state="rryyrryy"/> <!-- East-West yellow -->
+        <phase duration="{ns_green}" state="GGggrrrrGGggrrrr"/> <!-- North-South green -->
+        <phase duration="{yellow_time}" state="yyggrrrryyggRRRR"/> <!-- North-South yellow -->
+        <phase duration="{ew_green}" state="rrrrGGggrrrrGGgg"/> <!-- East-West green -->
+        <phase duration="{yellow_time}" state="rrrryyggrrrryygg"/> <!-- East-West yellow -->
     </tlLogic>
 </additional>
 """
@@ -441,7 +440,7 @@ To run the simulation with SUMO-GUI:
     sumo-gui -c {os.path.join(output_dir, "roswell_hwy41.sumocfg")}
 
 To run with the adaptive traffic light program:
-    sumo-gui -c {os.path.join(output_dir, "roswell_hwy41.sumocfg")} --tlslogic.program adaptive
+    sumo-gui -c {os.path.join(output_dir, "roswell_hwy41.sumocfg")} --tllogic.program adaptive
 
 To run a headless simulation:
     sumo -c {os.path.join(output_dir, "roswell_hwy41.sumocfg")}
