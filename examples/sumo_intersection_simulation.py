@@ -122,10 +122,10 @@ def create_basic_intersection_xml(intersection_id, lat, lon, output_dir):
     tls_xml = f"""<?xml version="1.0" encoding="UTF-8"?>
 <additional xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/additional_file.xsd">
     <tlLogic id="center" type="static" programID="0" offset="0">
-        <phase duration="31" state="GGggrrrrGGggrrrr"/> <!-- North-South green -->
-        <phase duration="4" state="yyggrrrryyggrrry"/> <!-- North-South yellow -->
-        <phase duration="31" state="rrrrGGggrrrrGGgg"/> <!-- East-West green -->
-        <phase duration="4" state="rrrryyggrrrryyyy"/> <!-- East-West yellow -->
+        <phase duration="31" state="GGggrrrGGgrr"/> <!-- North-South green -->
+        <phase duration="4" state="yyggrrryygry"/> <!-- North-South yellow -->
+        <phase duration="31" state="rrrGGggrrrGG"/> <!-- East-West green -->
+        <phase duration="4" state="rrryyggrrryy"/> <!-- East-West yellow -->
     </tlLogic>
 </additional>
 """
@@ -287,10 +287,10 @@ def generate_adaptive_tls_program(approaches, output_file):
     tls_xml = f"""<?xml version="1.0" encoding="UTF-8"?>
 <additional xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/additional_file.xsd">
     <tlLogic id="center" type="static" programID="adaptive" offset="0">
-        <phase duration="{ns_green}" state="GGggrrrrGGggrrrr"/> <!-- North-South green -->
-        <phase duration="{yellow_time}" state="yyggrrrryyggrrry"/> <!-- North-South yellow -->
-        <phase duration="{ew_green}" state="rrrrGGggrrrrGGgg"/> <!-- East-West green -->
-        <phase duration="{yellow_time}" state="rrrryyggrrrryyyy"/> <!-- East-West yellow -->
+        <phase duration="{ns_green}" state="GGggrrrGGgrr"/> <!-- North-South green -->
+        <phase duration="{yellow_time}" state="yyggrrryygry"/> <!-- North-South yellow -->
+        <phase duration="{ew_green}" state="rrrGGggrrrGG"/> <!-- East-West green -->
+        <phase duration="{yellow_time}" state="rrryyggrrryy"/> <!-- East-West yellow -->
     </tlLogic>
 </additional>
 """
