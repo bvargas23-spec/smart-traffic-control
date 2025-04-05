@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<viewsettings>
-    <scheme name="real world"/>
-    <delay value="50"/>
-    <viewport zoom="100" x="0" y="0"/>
-    <decal file="background.jpg" centerX="0" centerY="0" width="1000" height="1000" rotation="0.00"/>
-</viewsettings>
+
+<!-- generated on 2025-04-05 18:41:37.037124 by tileGet.py v1_22_0+0002-63e50f52594
+  options: <doubleminus>bbox 0,0,1,1 <doubleminus>tiles 2 <doubleminus>output-dir C:\Projects\smart-traffic-control-1\sumo_files <doubleminus>decals-file gui-settings.xml <doubleminus>url openstreetmap <doubleminus>maptype satellite
+-->
+
+<viewsettings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/viewsettings_file.xsd">

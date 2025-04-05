@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<configuration>
+  <bbox>-112.0750,33.4474,-112.0730,33.4494</bbox>
+  <tiles>2</tiles>
+  <output-dir>C:/Projects/smart-traffic-control-1/sumo_files</output-dir>
+  <decals-file>gui-settings.xml</decals-file>
+  <url>arcgis</url>
+  <maptype>satellite</maptype>
+  <user-agent>Mozilla/5.0 (Windows NT 10.0; Win64; x64)</user-agent>
+</configuration>
