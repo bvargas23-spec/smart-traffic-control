@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    
+        <script>
+            L_NO_TOUCH = false;
+            L_DISABLE_3D = false;
+        </script>
+    
+    <style>html, body {width: 100%;height: 100%;margin: 0;padding: 0;}</style>
+    <style>#map {position:absolute;top:0;bottom:0;right:0;left:0;}</style>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_2a849918a216955bb868eb871da118e7 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+        
+</head>
+<body>
+    
+    
+        <div style="position: fixed; 
+             bottom: 50px; right: 50px; width: 150px; height: 160px; 
+             border:2px solid grey; z-index:9999; font-size:12px;
+             background-color: white; padding: 10px;
+             border-radius: 5px;">
+             <p><b>Congestion Levels</b></p>
+             <p><i class="fa fa-circle" style="color:green"></i> Free Flowing (0)</p>
+             <p><i class="fa fa-circle" style="color:lightgreen"></i> Light (1)</p>
+             <p><i class="fa fa-circle" style="color:yellow"></i> Moderate (2)</p>
+             <p><i class="fa fa-circle" style="color:orange"></i> Heavy (3)</p>
+             <p><i class="fa fa-circle" style="color:red"></i> Very Heavy (4)</p>
+             <p><i class="fa fa-circle" style="color:darkred"></i> Stopped (5)</p>
+             <p><i class="fa fa-exclamation-triangle" style="color:purple"></i> Incident</p>
+        </div>
+        
+    
+        <div style="position: fixed; 
+             top: 10px; right: 10px; width: auto; 
+             border:2px solid grey; z-index:9999; font-size:12px;
+             background-color: white; padding: 5px;
+             border-radius: 5px;">
+             Data as of: 2025-04-06 15:46:10
+        </div>
+        
+    
+            <div class="folium-map" id="map_2a849918a216955bb868eb871da118e7" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_2a849918a216955bb868eb871da118e7 = L.map(
+                "map_2a849918a216955bb868eb871da118e7",
+                {
+                    center: [33.9417775, -84.51569],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 18,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_dc51aef6d5d57619825ab461db5afe59 = L.tileLayer(
+                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 19,
+  "maxNativeZoom": 19,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_dc51aef6d5d57619825ab461db5afe59.addTo(map_2a849918a216955bb868eb871da118e7);
+        
+    
+            var marker_f5faaac49d3c976343058bbdb1bea376 = L.marker(
+                [33.9423, -84.51568],
+                {
+}
+            ).addTo(map_2a849918a216955bb868eb871da118e7);
+        
+    
+            var icon_26baeef26f0913ba1e404a0ee348735d = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "lightgreen",
+  "iconColor": "white",
+  "icon": "info-sign",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_93ce16ca552988ffb2e7e3d496a0ed1f = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_fedc5eb300d0833c47e543803ae92402 = $(`<div id="html_fedc5eb300d0833c47e543803ae92402" style="width: 100.0%; height: 100.0%;">             <b>North</b><br>             Current Speed: 37 kph<br>             Free Flow Speed: 49 kph<br>             Current TT: 105 s<br>             Free Flow TT: 79 s<br>             Delay: 26 s<br>             Congestion Level: 1/5<br>             Traffic Score: 76/100<br>             Confidence: 1             </div>`)[0];
+                popup_93ce16ca552988ffb2e7e3d496a0ed1f.setContent(html_fedc5eb300d0833c47e543803ae92402);
+            
+        
+
+        marker_f5faaac49d3c976343058bbdb1bea376.bindPopup(popup_93ce16ca552988ffb2e7e3d496a0ed1f)
+        ;
+
+        
+    
+    
+            marker_f5faaac49d3c976343058bbdb1bea376.bindTooltip(
+                `<div>
+                     North: Level 1
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_f5faaac49d3c976343058bbdb1bea376.setIcon(icon_26baeef26f0913ba1e404a0ee348735d);
+            
+    
+            var marker_3c546d436d611f9572a580ee2344209e = L.marker(
+                [33.94125, -84.51568],
+                {
+}
+            ).addTo(map_2a849918a216955bb868eb871da118e7);
+        
+    
+            var icon_a014beb41e36fb8186756df9b2769805 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "green",
+  "iconColor": "white",
+  "icon": "info-sign",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_87422134e9aafc2f3815d82dbe8e77a3 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_27155413d913ebb30cc2d66fddb91815 = $(`<div id="html_27155413d913ebb30cc2d66fddb91815" style="width: 100.0%; height: 100.0%;">             <b>South</b><br>             Current Speed: 74 kph<br>             Free Flow Speed: 74 kph<br>             Current TT: 137 s<br>             Free Flow TT: 137 s<br>             Delay: 0 s<br>             Congestion Level: 0/5<br>             Traffic Score: 100/100<br>             Confidence: 1             </div>`)[0];
+                popup_87422134e9aafc2f3815d82dbe8e77a3.setContent(html_27155413d913ebb30cc2d66fddb91815);
+            
+        
+
+        marker_3c546d436d611f9572a580ee2344209e.bindPopup(popup_87422134e9aafc2f3815d82dbe8e77a3)
+        ;
+
+        
+    
+    
+            marker_3c546d436d611f9572a580ee2344209e.bindTooltip(
+                `<div>
+                     South: Level 0
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_3c546d436d611f9572a580ee2344209e.setIcon(icon_a014beb41e36fb8186756df9b2769805);
+            
+    
+            var marker_35f95e9bded7d3dd06fc11dee29641ad = L.marker(
+                [33.94178, -84.5147],
+                {
+}
+            ).addTo(map_2a849918a216955bb868eb871da118e7);
+        
+    
+            var icon_0824d0803530998ece557c54fdf491ce = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "green",
+  "iconColor": "white",
+  "icon": "info-sign",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_f1b8f0fb5e734a6573c99e44d40f8fa0 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_0bf915cf1e330f0d6dd9f53e24fe4645 = $(`<div id="html_0bf915cf1e330f0d6dd9f53e24fe4645" style="width: 100.0%; height: 100.0%;">             <b>East</b><br>             Current Speed: 51 kph<br>             Free Flow Speed: 51 kph<br>             Current TT: 19 s<br>             Free Flow TT: 19 s<br>             Delay: 0 s<br>             Congestion Level: 0/5<br>             Traffic Score: 100/100<br>             Confidence: 1             </div>`)[0];
+                popup_f1b8f0fb5e734a6573c99e44d40f8fa0.setContent(html_0bf915cf1e330f0d6dd9f53e24fe4645);
+            
+        
+
+        marker_35f95e9bded7d3dd06fc11dee29641ad.bindPopup(popup_f1b8f0fb5e734a6573c99e44d40f8fa0)
+        ;
+
+        
+    
+    
+            marker_35f95e9bded7d3dd06fc11dee29641ad.bindTooltip(
+                `<div>
+                     East: Level 0
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_35f95e9bded7d3dd06fc11dee29641ad.setIcon(icon_0824d0803530998ece557c54fdf491ce);
+            
+    
+            var marker_8277caaf3b8dbf2d8c5ff5f985501a05 = L.marker(
+                [33.94178, -84.5167],
+                {
+}
+            ).addTo(map_2a849918a216955bb868eb871da118e7);
+        
+    
+            var icon_3b32563dedd5473a47e7eda27feda8e5 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "lightgreen",
+  "iconColor": "white",
+  "icon": "info-sign",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_2597436c04eccbde7d123598302fac6f = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_927963672bf6b5b966d0bfd52dd41ce9 = $(`<div id="html_927963672bf6b5b966d0bfd52dd41ce9" style="width: 100.0%; height: 100.0%;">             <b>West</b><br>             Current Speed: 49 kph<br>             Free Flow Speed: 59 kph<br>             Current TT: 143 s<br>             Free Flow TT: 118 s<br>             Delay: 25 s<br>             Congestion Level: 1/5<br>             Traffic Score: 83/100<br>             Confidence: 1             </div>`)[0];
+                popup_2597436c04eccbde7d123598302fac6f.setContent(html_927963672bf6b5b966d0bfd52dd41ce9);
+            
+        
+
+        marker_8277caaf3b8dbf2d8c5ff5f985501a05.bindPopup(popup_2597436c04eccbde7d123598302fac6f)
+        ;
+
+        
+    
+    
+            marker_8277caaf3b8dbf2d8c5ff5f985501a05.bindTooltip(
+                `<div>
+                     West: Level 1
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_8277caaf3b8dbf2d8c5ff5f985501a05.setIcon(icon_3b32563dedd5473a47e7eda27feda8e5);
+            
+    
+            var rectangle_83061f208a05cc3f03603bfd09205dd7 = L.rectangle(
+                [[33.94025, -84.5177], [33.9433, -84.5137]],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_2a849918a216955bb868eb871da118e7);
+        
+    
+        var popup_c03ac1f15b7e675a71dc3e0535dd187a = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_aa05116c2c2fe77d0dc7fc7dff742f3c = $(`<div id="html_aa05116c2c2fe77d0dc7fc7dff742f3c" style="width: 100.0%; height: 100.0%;">Traffic Data Area</div>`)[0];
+                popup_c03ac1f15b7e675a71dc3e0535dd187a.setContent(html_aa05116c2c2fe77d0dc7fc7dff742f3c);
+            
+        
+
+        rectangle_83061f208a05cc3f03603bfd09205dd7.bindPopup(popup_c03ac1f15b7e675a71dc3e0535dd187a)
+        ;
+
+        
+    
+</script>
+</html>
