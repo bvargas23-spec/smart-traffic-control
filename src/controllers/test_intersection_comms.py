@@ -7,7 +7,7 @@ from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
 import os
 import logging
 import argparse
-
+import sys
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
