@@ -1,0 +1,436 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Traffic Control Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <style>
+        body {
+            padding-top: 20px;
+            background-color: #f5f5f5;
+        }
+        .status-card {
+            height: 100%;
+        }
+        .refresh-time {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+        .status-indicator {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+        .status-running {
+            background-color: #28a745;
+        }
+        .status-updated {
+            background-color: #17a2b8;
+        }
+        .status-adjusted {
+            background-color: #ffc107;
+        }
+        .status-unknown {
+            background-color: #6c757d;
+        }
+        .status-error {
+            background-color: #dc3545;
+        }
+        .congestion-Free-Flow {
+            background-color: #28a745;
+        }
+        .congestion-Light {
+            background-color: #79d279;
+        }
+        .congestion-Moderate {
+            background-color: #ffc107;
+        }
+        .congestion-Heavy {
+            background-color: #fd7e14;
+        }
+        .congestion-Severe {
+            background-color: #dc3545;
+        }
+        .congestion-Unknown {
+            background-color: #6c757d;
+        }
+        .traffic-light {
+            width: 50px;
+            height: 140px;
+            background-color: #333;
+            border-radius: 10px;
+            padding: 10px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .light {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #555;
+        }
+        .red {
+            background-color: #dc3545;
+        }
+        .yellow {
+            background-color: #ffc107;
+        }
+        .green {
+            background-color: #28a745;
+        }
+        .intersection-container {
+            margin-bottom: 30px;
+        }
+        .alert-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .congestion-alert {
+            border-left: 4px solid #ffc107;
+        }
+        .timing-alert {
+            border-left: 4px solid #17a2b8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Smart Traffic Control Dashboard</h1>
+            <div>
+                <button id="refresh-btn" class="btn btn-primary">Refresh Now</button>
+                <span class="refresh-time ms-2">Last update: <span id="last-update">Never</span></span>
+            </div>
+        </header>
+
+        <div class="row">
+            <div class="col-md-8">
+                <div id="intersections-container">
+                    <!-- Intersection cards will be added here dynamically -->
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between">
+                        <h5>Recent Alerts</h5>
+                        <button id="clear-alerts-btn" class="btn btn-sm btn-outline-secondary">Clear</button>
+                    </div>
+                    <div class="card-body">
+                        <div id="alerts-container" class="alert-list">
+                            <!-- Alerts will be added here dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Dashboard state
+        let dashboardState = {
+            intersections: {},
+            alerts: [],
+            last_update: null
+        };
+
+        // Refresh interval (milliseconds)
+        const REFRESH_INTERVAL = 5000;
+
+        // Function to fetch dashboard state
+        async function fetchDashboardState() {
+            try {
+                const response = await fetch('/api/dashboard-state');
+                const data = await response.json();
+                dashboardState = data;
+                updateDashboard();
+            } catch (error) {
+                console.error('Error fetching dashboard state:', error);
+            }
+        }
+
+        // Function to clear alerts
+        async function clearAlerts() {
+            try {
+                await fetch('/api/clear-alerts', {
+                    method: 'POST'
+                });
+                dashboardState.alerts = [];
+                updateDashboard();
+            } catch (error) {
+                console.error('Error clearing alerts:', error);
+            }
+        }
+
+        // Function to update the dashboard UI
+        function updateDashboard() {
+            // Update last update time
+            if (dashboardState.last_update) {
+                document.getElementById('last-update').textContent = dashboardState.last_update;
+            }
+
+            // Update intersections
+            updateIntersections();
+
+            // Update alerts
+            updateAlerts();
+        }
+
+        // Function to update intersections display
+        function updateIntersections() {
+            const container = document.getElementById('intersections-container');
+            container.innerHTML = ''; // Clear existing content
+
+            for (const [id, intersection] of Object.entries(dashboardState.intersections)) {
+                const intersectionCard = createIntersectionCard(id, intersection);
+                container.appendChild(intersectionCard);
+            }
+        }
+
+        // Function to create an intersection card
+        function createIntersectionCard(id, intersection) {
+            const statusClass = 'status-' + (intersection.status || 'unknown').toLowerCase();
+            
+            // Create container
+            const container = document.createElement('div');
+            container.className = 'intersection-container';
+            
+            // Create card
+            const card = document.createElement('div');
+            card.className = 'card status-card';
+            
+            // Create card header
+            const header = document.createElement('div');
+            header.className = 'card-header d-flex justify-content-between align-items-center';
+            
+            const title = document.createElement('h5');
+            title.innerHTML = `${intersection.name} <span class="badge bg-secondary">${intersection.role}</span>`;
+            
+            const statusBadge = document.createElement('div');
+            statusBadge.innerHTML = `
+                <span class="status-indicator ${statusClass}"></span>
+                ${intersection.status || 'Unknown'}
+            `;
+            
+            header.appendChild(title);
+            header.appendChild(statusBadge);
+            
+            // Create card body
+            const body = document.createElement('div');
+            body.className = 'card-body';
+            
+            // Traffic light visualization
+            const trafficLightRow = document.createElement('div');
+            trafficLightRow.className = 'row mb-4';
+
+            // North-South traffic light
+            const nsCol = document.createElement('div');
+            nsCol.className = 'col-6 text-center';
+            
+            const nsTitle = document.createElement('h6');
+            nsTitle.textContent = 'North-South';
+            
+            const nsLight = document.createElement('div');
+            nsLight.className = 'traffic-light mb-2';
+            
+            const nsRed = document.createElement('div');
+            nsRed.className = 'light red';
+            
+            const nsYellow = document.createElement('div');
+            nsYellow.className = 'light';
+            
+            const nsGreen = document.createElement('div');
+            nsGreen.className = 'light';
+            
+            // Set active light based on timing plan
+            if (intersection.timing_plan && intersection.status === 'running') {
+                // Simple simulation based on timing
+                const totalCycle = (intersection.timing_plan['NORTH_SOUTH'] || 30) + (intersection.timing_plan['EAST_WEST'] || 30) + 10; // Adding 10s for yellow phases
+                const currentTime = Date.now() / 1000;
+                const cyclePosition = currentTime % totalCycle;
+                
+                if (cyclePosition < intersection.timing_plan['NORTH_SOUTH']) {
+                    nsRed.className = 'light';
+                    nsYellow.className = 'light';
+                    nsGreen.className = 'light green';
+                } else if (cyclePosition < intersection.timing_plan['NORTH_SOUTH'] + 5) { // Yellow phase
+                    nsRed.className = 'light';
+                    nsYellow.className = 'light yellow';
+                    nsGreen.className = 'light';
+                } else {
+                    nsRed.className = 'light red';
+                    nsYellow.className = 'light';
+                    nsGreen.className = 'light';
+                }
+            }
+            
+            nsLight.appendChild(nsRed);
+            nsLight.appendChild(nsYellow);
+            nsLight.appendChild(nsGreen);
+            
+            const nsTimer = document.createElement('div');
+            nsTimer.textContent = `${intersection.timing_plan?.['NORTH_SOUTH'] || 30}s`;
+            
+            nsCol.appendChild(nsTitle);
+            nsCol.appendChild(nsLight);
+            nsCol.appendChild(nsTimer);
+            
+            // East-West traffic light
+            const ewCol = document.createElement('div');
+            ewCol.className = 'col-6 text-center';
+            
+            const ewTitle = document.createElement('h6');
+            ewTitle.textContent = 'East-West';
+            
+            const ewLight = document.createElement('div');
+            ewLight.className = 'traffic-light mb-2';
+            
+            const ewRed = document.createElement('div');
+            ewRed.className = 'light red';
+            
+            const ewYellow = document.createElement('div');
+            ewYellow.className = 'light';
+            
+            const ewGreen = document.createElement('div');
+            ewGreen.className = 'light';
+            
+            // Set active light based on timing plan
+            if (intersection.timing_plan && intersection.status === 'running') {
+                // Simple simulation based on timing
+                const totalCycle = (intersection.timing_plan['NORTH_SOUTH'] || 30) + (intersection.timing_plan['EAST_WEST'] || 30) + 10; // Adding 10s for yellow phases
+                const currentTime = Date.now() / 1000;
+                const cyclePosition = currentTime % totalCycle;
+                
+                if (cyclePosition < intersection.timing_plan['NORTH_SOUTH'] + 5) { // NS phase + yellow
+                    ewRed.className = 'light red';
+                    ewYellow.className = 'light';
+                    ewGreen.className = 'light';
+                } else if (cyclePosition < totalCycle - 5) { // EW green phase
+                    ewRed.className = 'light';
+                    ewYellow.className = 'light';
+                    ewGreen.className = 'light green';
+                } else { // EW yellow phase
+                    ewRed.className = 'light';
+                    ewYellow.className = 'light yellow';
+                    ewGreen.className = 'light';
+                }
+            }
+            
+            ewLight.appendChild(ewRed);
+            ewLight.appendChild(ewYellow);
+            ewLight.appendChild(ewGreen);
+            
+            const ewTimer = document.createElement('div');
+            ewTimer.textContent = `${intersection.timing_plan?.['EAST_WEST'] || 30}s`;
+            
+            ewCol.appendChild(ewTitle);
+            ewCol.appendChild(ewLight);
+            ewCol.appendChild(ewTimer);
+            
+            trafficLightRow.appendChild(nsCol);
+            trafficLightRow.appendChild(ewCol);
+            
+            // Traffic conditions
+            const trafficRow = document.createElement('div');
+            trafficRow.className = 'row';
+            
+            // Loop through approaches
+            for (const [approach, congestion] of Object.entries(intersection.traffic_conditions)) {
+                const congestionClass = 'congestion-' + (congestion || 'Unknown').replace(' ', '-');
+                
+                const col = document.createElement('div');
+                col.className = 'col-3 text-center';
+                
+                const label = document.createElement('div');
+                label.textContent = approach;
+                
+                const indicator = document.createElement('div');
+                indicator.className = `status-indicator ${congestionClass}`;
+                indicator.style.width = '30px';
+                indicator.style.height = '30px';
+                indicator.style.margin = '0 auto';
+                
+                const congestionText = document.createElement('div');
+                congestionText.textContent = congestion || 'Unknown';
+                congestionText.style.fontSize = '0.8rem';
+                
+                col.appendChild(label);
+                col.appendChild(indicator);
+                col.appendChild(congestionText);
+                
+                trafficRow.appendChild(col);
+            }
+            
+            // Add update time
+            const footer = document.createElement('div');
+            footer.className = 'card-footer text-muted text-end';
+            footer.textContent = `Last updated: ${intersection.last_update || 'Unknown'}`;
+            
+            // Assemble card
+            body.appendChild(trafficLightRow);
+            body.appendChild(trafficRow);
+            
+            card.appendChild(header);
+            card.appendChild(body);
+            card.appendChild(footer);
+            
+            container.appendChild(card);
+            
+            return container;
+        }
+
+        // Function to update alerts display
+        function updateAlerts() {
+            const container = document.getElementById('alerts-container');
+            container.innerHTML = ''; // Clear existing alerts
+
+            if (dashboardState.alerts.length === 0) {
+                const noAlerts = document.createElement('div');
+                noAlerts.className = 'text-muted text-center py-3';
+                noAlerts.textContent = 'No alerts to display';
+                container.appendChild(noAlerts);
+                return;
+            }
+
+            for (const alert of dashboardState.alerts) {
+                const alertClass = alert.type === 'congestion' ? 'congestion-alert' : 'timing-alert';
+                
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `alert alert-light mb-2 ${alertClass}`;
+                
+                const time = document.createElement('div');
+                time.className = 'small text-muted';
+                time.textContent = alert.timestamp;
+                
+                const source = document.createElement('div');
+                source.className = 'fw-bold';
+                source.textContent = alert.intersection;
+                
+                const message = document.createElement('div');
+                message.textContent = alert.message;
+                
+                alertDiv.appendChild(time);
+                alertDiv.appendChild(source);
+                alertDiv.appendChild(message);
+                
+                container.appendChild(alertDiv);
+            }
+        }
+
+        // Event listeners
+        document.getElementById('refresh-btn').addEventListener('click', fetchDashboardState);
+        document.getElementById('clear-alerts-btn').addEventListener('click', clearAlerts);
+
+        // Initial data fetch and set up auto-refresh
+        fetchDashboardState();
+        setInterval(fetchDashboardState, REFRESH_INTERVAL);
+    </script>
+</body>
+</html>
