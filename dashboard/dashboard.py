@@ -473,17 +473,20 @@ def clear_alerts():
 @app.route('/api/connection-status')
 def connection_status():
     """Check if the dashboard is connected to AWS IoT"""
+    global mqtt_client
+    
     if not aws_iot_available:
         return jsonify({"status": "unavailable", "message": "AWS IoT Python SDK not available"})
         
     if mqtt_client is None:
         return jsonify({"status": "not_initialized", "message": "MQTT client not initialized"})
-        
-    # Check if the client is connected
-    if mqtt_client._mqtt_core.getClient()._mqtt_client.is_connected():
-        return jsonify({"status": "connected", "message": "Connected to AWS IoT"})
-    else:
-        return jsonify({"status": "disconnected", "message": "Not connected to AWS IoT"})
+    
+    # Return the current connection status without trying to access internal properties
+    return jsonify({
+        "status": "initialized", 
+        "message": "MQTT client initialized, see dashboard for real-time updates",
+        "last_update": dashboard_state["last_update"]
+    })
 
 def start_dashboard(host='0.0.0.0', port=8080, debug=False, use_simulated_data=True):
     # Start MQTT client in background thread if available
