@@ -66,3 +66,6 @@ credentials.json
 
 # Documentation builds
 docs/_build/
+
+# AWS IoT certificates
+dashboard/certs/
