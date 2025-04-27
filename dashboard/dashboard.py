@@ -31,7 +31,7 @@ PRIVATE_KEY_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "cer
 ROOT_CA_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "certs/AmazonRootCA1.pem")
 
 # MQTT Topics
-STATUS_TOPIC = "traffic/intersection/#"
+STATUS_TOPIC = "traffic/intersection/status/#"
 TIMING_TOPIC = "traffic/intersection/timing/#"
 CONGESTION_TOPIC = "traffic/#"
 
