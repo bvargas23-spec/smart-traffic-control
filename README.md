@@ -7,14 +7,14 @@ An intelligent traffic management solution that combines real-time data analysis
 
 ## Project Overview
 
-The Smart Traffic Control System integrates traffic data from various sources (including TomTom API) with machine learning algorithms to dynamically adjust traffic signal timing. The system runs on embedded hardware (BeagleBone Black and STM32 microcontrollers) to provide real-time control of traffic signals.
+The Smart Traffic Control System integrates traffic data from various sources (including TomTom API) with machine learning algorithms to dynamically adjust traffic signal timing. The system runs on embedded hardware (BeagleBone Black) to provide real-time control of traffic signals.
 
 ### Key Features
 
 - Real-time traffic data acquisition and processing
 - Adaptive traffic signal control algorithms
 - Machine learning-based traffic pattern prediction
-- Embedded hardware integration (BeagleBone Black + STM32)
+- Embedded hardware integration (BeagleBone Black)
 - Interactive dashboard for monitoring and configuration
 - Simulation environment for testing and validation
 
@@ -32,8 +32,7 @@ smart-traffic-control/
 │   │   ├── data_processor.py
 │   │   └── traffic_analyzer.py
 │   ├── controllers/        # Hardware control modules
-│   │   ├── beaglebone_controller.py
-│   │   └── stm32_interface.py
+│   │   └── beaglebone_controller.py
 │   ├── models/             # Traffic modeling and ML algorithms
 │   │   ├── traffic_model.py
 │   │   └── adaptive_algorithm.py
@@ -56,7 +55,6 @@ smart-traffic-control/
 
 - Python 3.9 or higher
 - BeagleBone Black (Rev C or newer)
-- STM32 microcontroller development board
 - TomTom API key (for traffic data)
 - Internet connectivity for the BeagleBone
 
@@ -64,7 +62,7 @@ smart-traffic-control/
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/smart-traffic-control.git
+   git clone https://github.com/bvargas23-spec/smart-traffic-control.git
    cd smart-traffic-control
    ```
 
@@ -92,7 +90,6 @@ smart-traffic-control/
 
 Refer to `docs/setup_guide.md` for detailed hardware setup instructions, including:
 - BeagleBone Black configuration
-- STM32 microcontroller programming
 - Traffic light controller wiring diagrams
 - Sensor integration guidelines
 
@@ -148,10 +145,15 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Acknowledgments
 
 - TomTom API for providing traffic data
-- BeagleBone and STM32 communities for embedded system resources
+- BeagleBone community for embedded system resources
+- KSU Electrical and Computer Engineering Department
+- Dr. Grosch – for presiding over Senior Design and leadership throughout the capstone process
+- Dr. Okhio – for guidance during Professional Practice in preparing us for industry challenges
+- Dr. Yiin – for the Intro to IoT course, advising, and involvement in Lunch and Learn sessions
+- Dr. Klein – for leadership and opportunities as a student assistant in the ECE department
 - Contributors and maintainers
 
 ## Contact
 
-Your Name - your.email@example.com
-Project Link: [https://github.com/yourusername/smart-traffic-control](https://github.com/yourusername/smart-traffic-control)
+Your Name - brianadonai123@gmail.com
+Project Link: [https://github.com/bvargas23-spec/smart-traffic-control](https://github.com/bvargas23-spec/smart-traffic-control)
