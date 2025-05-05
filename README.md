@@ -155,5 +155,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Contact
 
-Your Name - brianadonai123@gmail.com
+Brian Vargas - brianadonai123@gmail.com
 Project Link: [https://github.com/bvargas23-spec/smart-traffic-control](https://github.com/bvargas23-spec/smart-traffic-control)
+LinkedIn Link: https://www.linkedin.com/in/brian-vargas18
